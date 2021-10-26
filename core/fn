@@ -1,0 +1,293 @@
+#!/bin/bash
+
+service::get_dirs() {
+  string_split : $PLUGIN_SERVICE_SERVICES
+}
+
+service::get_path() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[service::get_config_path] name is required"
+    exit 1
+  fi
+
+  echo $PLUGIN_SERVICE_SERVICES/$name
+}
+
+service::get_config_path() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[service::get_config_path] name is required"
+    exit 1
+  fi
+
+  echo $PLUGIN_SERVICE_SERVICES/$name/config
+}
+
+service::get_repo_url() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::get_repo_url] name is required"
+    exit 1
+  fi
+
+  echo ${PACKAGES_REPO_PREFIX}${name}
+}
+
+service::list() {
+  local avaliable_service_dirs=$(service::get_dirs)
+  log "List all available services"
+  log ""
+
+  for service_dir in $avaliable_service_dirs; do
+    # local namespace=$(echo $service_dir | awk -F '/' '{print $(NF-0)}')
+    local namespace=$(string_split_last_element '/' $service_dir)
+    if [ ! -d $service_dir ]; then
+      log "  namespace: $namespace ($service_dir)"
+      log "    (no avaliable services)"
+      log ""
+      continue
+    fi
+
+    local service_names=$(ls $service_dir)
+    # local service_count=$(echo $service_names | wc -w)
+    local service_count=0
+    for service_name in $service_names; do
+      local service_path=$service_dir/$service_name
+
+      # Check is a real service
+      if [ -f $service_path/docker-compose.yml ]; then
+        service_count=$((service_count + 1))
+      fi
+    done
+
+    log "  namespace: $namespace (total: $service_count) ($service_dir)"
+    local index=0
+    for service_name in $service_names; do
+      local service_path=$service_dir/$service_name
+
+      # Check is a real service
+      if [ -f $service_path/docker-compose.yml ]; then
+        index=$(number_step index)
+        log "    $(color_success "$index $service_name")"
+      fi
+    done
+
+    if [ $service_count -eq 0 ]; then
+      log "    (no avaliable services)"
+    fi
+
+    log ""
+  done
+}
+
+service::run() {
+  local service_name=$1
+  local commands=${@:2}
+
+  log_debug "[$(timestamp)][service] PLUGIN_SERVICE_SERVICES: $PLUGIN_SERVICE_SERVICES"
+  log_debug "[$(timestamp)][service] service name: $service_name"
+  log_debug "[$(timestamp)][service] service command: $commands"
+
+  local service_path=$(service::get_path $service_name)
+  if [ "$service_path" = "" ]; then
+    log_error "[$(timestamp)][service] service($service_name) not found"
+    exit 1
+  fi
+
+  local service_config_path=$(service::get_config_path $service_name)
+  if [ -f "$service_config_path" ]; then
+    load_config_file $service_config_path
+  fi
+
+  log_debug ""
+  cd $service_path
+  docker-compose -f docker-compose.yml $commands
+}
+
+service::get_config() {
+  local service_name=$1
+
+  local service_path=$(service::get_path $service_name)
+  if [ "$service_path" = "" ]; then
+    log_error "[$(timestamp)][service] service($service_name) not found"
+    exit 1
+  fi
+
+  local service_config=$service_path/docker-compose.yml
+  if [ ! -f $service_config ]; then
+    log_error "[$(timestamp)][service] service($service_name) config(docker-compose.yml) not found"
+  fi
+
+  echo $service_config
+}
+
+service::get_data_path() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[service::get_data_path] name is required"
+    exit 1
+  fi
+
+  local path="$PLUGIN_SERVICE_DATA/$name"
+  if [ ! -d "$path" ]; then
+    if [ ! -w "PLUGIN_SERVICE_DATA" ]; then
+      sudo mkdir -p $path
+      sudo chown $USER $path
+    else
+      mkdir -p $path
+    fi 
+  fi
+
+  echo $path
+}
+
+service::get_logs_path() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[service::get_logs_path] name is required"
+    exit 1
+  fi
+
+  local path="$PLUGIN_SERVICE_LOGS/$name"
+  if [ ! -d "$path" ]; then
+    if [ ! -w "PLUGIN_SERVICE_DATA" ]; then
+      sudo mkdir -p $path
+      sudo chown $USER $path
+    else
+      mkdir -p $path
+    fi 
+  fi
+
+  echo $path
+}
+
+service::get_configs_path() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[service::get_logs_path] name is required"
+    exit 1
+  fi
+
+  local path="$PLUGIN_SERVICE_CONFIGS/$name"
+  if [ ! -d "$path" ]; then
+    if [ ! -w "PLUGIN_SERVICE_DATA" ]; then
+      sudo mkdir -p $path
+      sudo chown $USER $path
+    else
+      mkdir -p $path
+    fi 
+  fi
+
+  echo $path
+}
+
+service::clone() {
+  local name=$1
+  local version=$2
+
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::clone] name is required"
+    exit 1
+  fi
+
+  if [ -z "$version" ]; then
+    version=master
+  fi
+
+  local service_path=$(service::get_path $name)
+  local service_repo_url=$(service::get_repo_url $name)
+  if [ ! -d "$service_path" ]; then
+    curl -I $service_repo_url 2>>/dev/null | head -n 1 | grep 404 >>/dev/null 2>&1
+    if [ "$?" = "0" ]; then
+      log_error "[$(timestamp)][service::clone] service ${name} is not available"
+      exit 1
+    fi
+
+    git clone $service_repo_url -b $version $service_path >>$ZMICRO_LOG_COMMON_PATH # 2>>$ZMICRO_LOG_ERROR_PATH
+    if [ "$?" != "0" ]; then
+      log_error "[$(timestamp)][service::clone] error $name($version) ..."
+      exit 1
+    fi
+  else
+    cd $service_path
+    git pull origin master >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+    if [ "$?" != "0" ]; then
+      echo "[$(timestamp)][service::clone] update service repo ${name} ..."
+      tail -n 50 $ZMICRO_LOG_ERROR_PATH
+      exit -1
+    fi
+  fi
+}
+
+service::install() {
+  local name=$1
+  local version=$2
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::install] name is required"
+    exit 1
+  fi
+
+  # download
+  service::clone $name $version
+
+  # start service
+  service::run $name up -d
+}
+
+service::remove() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::remove] name is required"
+    exit 1
+  fi
+
+  local service_path=$(service::get_path $name)
+  if [ ! -d "$service_path" ]; then
+    log_error "[$(timestamp)][service::remove] service($name) not found"
+    exit 1
+  fi
+
+  # stop service
+  service::run $name down
+
+  # remove service dir
+  rm -rf $service_path
+}
+
+service::update() {
+  local name=$1
+  local args=${@:2}
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::update] name is required"
+    exit 1
+  fi
+
+  # update repo
+  service::clone $name $version
+
+  # pull
+  service::run $name pull $args
+  # rollup
+  service::run $name down $args
+  service::run $name up -d $args
+}
+
+export -f service::get_dirs
+export -f service::get_path
+export -f service::get_config_path
+export -f service::get_repo_url
+
+export -f service::get_config
+
+export -f service::get_data_path
+export -f service::get_logs_path
+export -f service::get_configs_path
+
+export -f service::run
+export -f service::list
+
+export -f service::clone
+export -f service::install
+export -f service::remove
+export -f service::update

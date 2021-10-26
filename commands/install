@@ -1,0 +1,34 @@
+#!/bin/bash
+
+help() {
+  echo "Usage:"
+  echo "  zservice install <service>"
+  echo ""
+}
+
+core() {
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+  
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "service name is requried"
+    exit 1
+  fi
+
+  # @TODO
+  local version=""
+  if [ "$2" = "-v" ]; then
+    version=$3
+  fi
+
+  service::install $name $version
+}
+
+run() {
+  core $@
+}
+
+run $@

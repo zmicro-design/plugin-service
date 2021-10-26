@@ -1,0 +1,20 @@
+#!/bin/bash
+
+help() {
+  echo "
+Usage:
+  list    List all services
+  ls      Alias of list
+  start   Start service in production mode
+  stop    Stop service
+  resart  Restart service
+  update  Update service env config and restart
+  logs    Show service logs
+  status  Show services status
+  exec    Execute in service
+  config  Validate service Config
+  version Show swarm version
+"
+}
+
+help

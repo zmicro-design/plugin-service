@@ -1,0 +1,3 @@
+PLUGIN_VERSION=v0.0.0
+
+PLUGIN_DESCRIPTION="Service Manager"
