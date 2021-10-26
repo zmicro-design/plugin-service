@@ -14,6 +14,17 @@ service::get_path() {
   echo $PLUGIN_SERVICE_SERVICES/$name
 }
 
+service::get_mod_path() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::get_mod_path] name is required"
+    exit 1
+  fi
+
+  local service_path=$(service::get_path $name)
+  echo $service_path/mod
+}
+
 service::get_config_path() {
   local name=$1
   if [ -z "$name" ]; then
@@ -31,7 +42,7 @@ service::get_repo_url() {
     exit 1
   fi
 
-  echo ${PACKAGES_REPO_PREFIX}${name}
+  echo ${PLUGIN_SERVICE_PREFIX}${name}
 }
 
 service::list() {
@@ -182,6 +193,22 @@ service::get_configs_path() {
   echo $path
 }
 
+service::load_mod() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::load_mod] name is required"
+    exit 1
+  fi
+
+  local service_mod_path=$(service::get_mod_path $name)
+  if [ ! -f $service_mod_path ]; then
+    log_error "[$(timestamp)][service::load_mod] name is required"
+    exit 1
+  fi
+
+  load_config_file $service_mod_path
+}
+
 service::clone() {
   local name=$1
   local version=$2
@@ -273,8 +300,43 @@ service::update() {
   service::run $name up -d $args
 }
 
+service::version() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::version] name is required"
+    exit 1
+  fi
+
+  # @TODO
+  if [ ! -f "$(service::get_mod_path $name)" ]; then
+    echo "-"
+    return
+  fi
+
+  service::load_mod $name
+  echo $VERSION
+}
+
+service::description() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log_error "[$(timestamp)][service::description] name is required"
+    exit 1
+  fi
+
+  if [ ! -f "$(service::get_mod_path $name)" ]; then
+    echo "No Description"
+    return
+  fi
+
+  service::load_mod $name
+  echo $DESCRIPTION
+}
+
 export -f service::get_dirs
 export -f service::get_path
+
+export -f service::get_mod_path
 export -f service::get_config_path
 export -f service::get_repo_url
 
@@ -284,6 +346,8 @@ export -f service::get_data_path
 export -f service::get_logs_path
 export -f service::get_configs_path
 
+export -f service::load_mod
+
 export -f service::run
 export -f service::list
 
@@ -291,3 +355,6 @@ export -f service::clone
 export -f service::install
 export -f service::remove
 export -f service::update
+
+export -f service::version
+export -f service::description
