@@ -11,13 +11,13 @@ help() {
 core() {
   local service=$1
   if [ "$service" = "" ]; then
-    log_error "service is required"
+    log::error "service is required"
     exit 1
   fi
 
   cd $SWARM_PLUGIN_SERVICE_PATH/$service
   if [ ! -f .env ]; then
-    log_error "Please use .env instead of write all config in docker-compose.yml"
+    log::error "Please use .env instead of write all config in docker-compose.yml"
     exit 1
   fi
 

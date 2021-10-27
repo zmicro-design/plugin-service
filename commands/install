@@ -14,7 +14,7 @@ core() {
   
   local name=$1
   if [ -z "$name" ]; then
-    log_error "service name is requried"
+    log::error "service name is requried"
     exit 1
   fi
 

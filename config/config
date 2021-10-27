@@ -2,11 +2,11 @@
 export PLUGIN_SERVICE_NAME=service
 export PLUGIN_SERVICE_PREFIX=https://github.com/zmicro-design/service-
 
-export PLUGIN_SERVICE_DATA=$(plugin_get_app_data_path $PLUGIN_SERVICE_NAME)
-export PLUGIN_SERVICE_LOGS=$(plugin_get_app_logs_path $PLUGIN_SERVICE_NAME)
-export PLUGIN_SERVICE_CONFIGS=$(plugin_get_app_configs_path $PLUGIN_SERVICE_NAME)/config
+export PLUGIN_SERVICE_DATA=$(plugin::get_app_data_path $PLUGIN_SERVICE_NAME)
+export PLUGIN_SERVICE_LOGS=$(plugin::get_app_logs_path $PLUGIN_SERVICE_NAME)
+export PLUGIN_SERVICE_CONFIGS=$(plugin::get_app_configs_path $PLUGIN_SERVICE_NAME)/config
 
-export PLUGIN_SERVICE_SERVICES=$(plugin_get_path $PLUGIN_SERVICE_NAME)/services
+export PLUGIN_SERVICE_SERVICES=$(plugin::get_path $PLUGIN_SERVICE_NAME)/services
 
 
 # echo "PLUGIN_SERVICE_DATA: $PLUGIN_SERVICE_DATA"

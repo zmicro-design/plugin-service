@@ -20,10 +20,10 @@ core() {
   local _command=${@:2}
   local command=${_command:-$default_command}
 
-  log_debug "[service][exec] command: $command"
+  log::debug "[service][exec] command: $command"
 
-  if [ "$(string_match $service_name :)" = "true" ]; then
-    local splits=($(string_split : $service_name))
+  if [ "$(string::match $service_name :)" = "true" ]; then
+    local splits=($(string::split : $service_name))
     service_name=${splits[0]}
     sub_service_name=${splits[1]}
   fi
@@ -32,11 +32,11 @@ core() {
     # service::run $service_name ps $args
     local services=$(service::run $service_name ps --services)
     local count=$(echo $services | wc -w)
-    log_debug "[service][exec] select services: $services, count: $count"
+    log::debug "[service][exec] select services: $services, count: $count"
 
     # No service found, maybe not start
     if [ $count -eq 0 ]; then
-      log_error "you should start service first"
+      log::error "you should start service first"
       exit 1
     fi
 
@@ -47,8 +47,8 @@ core() {
     fi
 
     local services_for_select=($services)
-    inquirer_select "Select an service ?" services_for_select select_service
-    log_debug "[service][exec] select service: $select_service"
+    inquirer::select "Select an service ?" services_for_select select_service
+    log::debug "[service][exec] select service: $select_service"
 
     sub_service_name=$select_service
   fi

@@ -20,13 +20,13 @@ core() {
 
   local service_path=$(service::get_path $service_name)
   if [ "$service_path" = "" ]; then
-    log_error "[$(timestamp)][service][env] service($service_name) not found"
+    log::error "[$(timestamp)][service][env] service($service_name) not found"
     exit 1
   fi
 
   local service_env_path=$service_path/.env
   if [ ! -f $service_env_path ]; then
-    log_error "service($service_name) .env file not found"
+    log::error "service($service_name) .env file not found"
     exit 1
   fi
 
