@@ -142,7 +142,7 @@ service::run() {
   log::info "SERVICE_CONFIG: $SERVICE_CONFIG"
 
   cd $service_path
-  # docker-compose -f docker-compose.yml $commands
+  docker-compose -f docker-compose.yml $commands
 }
 
 service::run_check() {
