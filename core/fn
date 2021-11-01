@@ -132,7 +132,7 @@ service::run() {
   fi
 
   service::run_check $service_name
-  if [ "$?" != "0" ]; then
+  if [ "$SERVICE_RUN_CHECK_OK" != "true" ]; then
     # log::error "[service::run] service run check error"
     exit 1
   fi
@@ -146,6 +146,9 @@ service::run() {
 }
 
 service::run_check() {
+  #@TODO
+  export SERVICE_RUN_CHECK_OK=false
+
   local name=$1
   if [ -z "$name" ]; then
     log::error "[service::run_check] name is required"
@@ -153,9 +156,17 @@ service::run_check() {
   fi
 
   local service_check_path="$(service::get_path $name)/check"
-  if [ -f "$service_check_path" ]; then
-    $service_check_path
+  if [ ! -f "$service_check_path" ]; then
+    service::run_check_ok
+    return
   fi
+
+  # custom check
+  $service_check_path
+}
+
+service::run_check_ok() {
+  export SERVICE_RUN_CHECK_OK=true
 }
 
 service::get_config() {
@@ -402,3 +413,4 @@ export -f service::version
 export -f service::description
 
 export -f service::run_check
+export -f service::run_check_ok
