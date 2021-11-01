@@ -106,14 +106,56 @@ service::run() {
     exit 1
   fi
 
+  # @TODO
+  export SERVICE_DATA=$(service::get_data_path $service_name)
+  export SERVICE_LOGS=$(service::get_logs_path $service_name)
+  export SERVICE_CONFIG=$(service::get_configs_path $service_name)/config
+
+  if [ -z "$SERVICE_DATA" ]; then
+    log::error "[service::run] SERVICE_DATA is empty"
+    exit 1
+  fi
+
+  if [ -z "$SERVICE_LOGS" ]; then
+    log::error "[service::run] SERVICE_LOGS is empty"
+    exit 1
+  fi
+
+  if [ "$SERVICE_CONFIG" = "/config" ]; then
+    log::error "[service::run] SERVICE_CONFIG is not valid"
+    exit 1
+  fi
+
   local service_config_path=$(service::get_config_path $service_name)
   if [ -f "$service_config_path" ]; then
     config::load_file $service_config_path
   fi
 
-  log::debug ""
+  service::run_check $service_name
+  if [ "$?" != "0" ]; then
+    # log::error "[service::run] service run check error"
+    exit 1
+  fi
+
+  log::info "SERVICE_DATA: $SERVICE_DATA"
+  log::info "SERVICE_LOGS: $SERVICE_LOGS"
+  log::info "SERVICE_CONFIG: $SERVICE_CONFIG"
+
   cd $service_path
-  docker-compose -f docker-compose.yml $commands
+  # docker-compose -f docker-compose.yml $commands
+}
+
+service::run_check() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[service::run_check] name is required"
+    exit 1
+  fi
+
+  local service_check_path="$(service::get_path $name)/check"
+  if [ -f "$service_check_path" ]; then
+    $service_check_path
+  fi
 }
 
 service::get_config() {
@@ -358,3 +400,5 @@ export -f service::update
 
 export -f service::version
 export -f service::description
+
+export -f service::run_check
