@@ -131,9 +131,10 @@ service::run() {
     config::load_file $service_config_path
   fi
 
+  #@TODO
   service::run_check $service_name
-  if [ "$SERVICE_RUN_CHECK_OK" != "true" ]; then
-    # log::error "[service::run] service run check error"
+  if [ "$?" != "0" ]; then
+    log::error "[service::run] service run check error"
     exit 1
   fi
 
@@ -141,14 +142,16 @@ service::run() {
   log::info "SERVICE_LOGS: $SERVICE_LOGS"
   log::info "SERVICE_CONFIG: $SERVICE_CONFIG"
 
+  # @TODO load global
+  if [ -f "$SERVICE_CONFIG" ]; then
+    config::load_file $SERVICE_CONFIG
+  fi
+
   cd $service_path
   docker-compose -f docker-compose.yml $commands
 }
 
 service::run_check() {
-  #@TODO
-  export SERVICE_RUN_CHECK_OK=false
-
   local name=$1
   if [ -z "$name" ]; then
     log::error "[service::run_check] name is required"
@@ -157,12 +160,13 @@ service::run_check() {
 
   local service_check_path="$(service::get_path $name)/check"
   if [ ! -f "$service_check_path" ]; then
-    service::run_check_ok
-    return
+    exit 0
   fi
 
   # custom check
-  $service_check_path
+  # $service_check_path
+  # @TODO use . cannot load env
+  . $service_check_path
 }
 
 service::run_check_ok() {
