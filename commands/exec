@@ -30,7 +30,7 @@ core() {
 
   if [ -z "$sub_service_name" ]; then
     # service::run $service_name ps $args
-    local services=$(service::run $service_name ps --services)
+    local services=$(service::list_sub_services $service_name)
     local count=$(echo $services | wc -w)
     log::debug "[service][exec] select services: $services, count: $count"
 

@@ -92,59 +92,43 @@ service::list() {
   done
 }
 
+service::list_sub_services() {
+  local name=$1
+  local service_path=$(service::get_path $name)
+  if [ "$service_path" = "" ]; then
+    log::error "[$(timestamp)][service] service($name) not found"
+    exit 1
+  fi
+  
+  # @TODO
+  service::load_config $name
+
+  cd $service_path
+  docker-compose -f docker-compose.yml ps --services
+}
+
 service::run() {
-  local service_name=$1
+  local name=$1
   local commands=${@:2}
 
   log::debug "[$(timestamp)][service] PLUGIN_SERVICE_SERVICES: $PLUGIN_SERVICE_SERVICES"
-  log::debug "[$(timestamp)][service] service name: $service_name"
+  log::debug "[$(timestamp)][service] service name: $name"
   log::debug "[$(timestamp)][service] service command: $commands"
 
-  local service_path=$(service::get_path $service_name)
+  local service_path=$(service::get_path $name)
   if [ "$service_path" = "" ]; then
-    log::error "[$(timestamp)][service] service($service_name) not found"
+    log::error "[$(timestamp)][service] service($name) not found"
     exit 1
   fi
 
   # @TODO
-  export SERVICE_DATA=$(service::get_data_path $service_name)
-  export SERVICE_LOGS=$(service::get_logs_path $service_name)
-  export SERVICE_CONFIG=$(service::get_configs_path $service_name)/config
-
-  if [ -z "$SERVICE_DATA" ]; then
-    log::error "[service::run] SERVICE_DATA is empty"
-    exit 1
-  fi
-
-  if [ -z "$SERVICE_LOGS" ]; then
-    log::error "[service::run] SERVICE_LOGS is empty"
-    exit 1
-  fi
-
-  if [ "$SERVICE_CONFIG" = "/config" ]; then
-    log::error "[service::run] SERVICE_CONFIG is not valid"
-    exit 1
-  fi
-
-  local service_config_path=$(service::get_config_path $service_name)
-  if [ -f "$service_config_path" ]; then
-    config::load_file $service_config_path
-  fi
+  service::load_config $name
 
   #@TODO
-  service::run_check $service_name
+  service::run_check $name
   if [ "$?" != "0" ]; then
     log::error "[service::run] service run check error"
     exit 1
-  fi
-
-  log::info "SERVICE_DATA: $SERVICE_DATA"
-  log::info "SERVICE_LOGS: $SERVICE_LOGS"
-  log::info "SERVICE_CONFIG: $SERVICE_CONFIG"
-
-  # @TODO load global
-  if [ -f "$SERVICE_CONFIG" ]; then
-    config::load_file $SERVICE_CONFIG
   fi
 
   cd $service_path
@@ -264,6 +248,48 @@ service::load_mod() {
   fi
 
   config::load_file $service_mod_path
+}
+
+service::load_config() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service::load_mod] name is required"
+    exit 1
+  fi
+
+  # @TODO
+  export SERVICE_DATA=$(service::get_data_path $name)
+  export SERVICE_LOGS=$(service::get_logs_path $name)
+  export SERVICE_CONFIG=$(service::get_configs_path $name)/config
+
+  if [ -z "$SERVICE_DATA" ]; then
+    log::error "[service::run] SERVICE_DATA is empty"
+    exit 1
+  fi
+
+  if [ -z "$SERVICE_LOGS" ]; then
+    log::error "[service::run] SERVICE_LOGS is empty"
+    exit 1
+  fi
+
+  if [ "$SERVICE_CONFIG" = "/config" ]; then
+    log::error "[service::run] SERVICE_CONFIG is not valid"
+    exit 1
+  fi
+
+  local service_config_path=$(service::get_config_path $name)
+  if [ -f "$service_config_path" ]; then
+    config::load_file $service_config_path
+  fi
+
+  # log::info "SERVICE_DATA: $SERVICE_DATA"
+  # log::info "SERVICE_LOGS: $SERVICE_LOGS"
+  # log::info "SERVICE_CONFIG: $SERVICE_CONFIG"
+
+  # @TODO load global
+  if [ -f "$SERVICE_CONFIG" ]; then
+    config::load_file $SERVICE_CONFIG
+  fi
 }
 
 service::clone() {
@@ -404,9 +430,11 @@ export -f service::get_logs_path
 export -f service::get_configs_path
 
 export -f service::load_mod
+export -f service::load_config
 
 export -f service::run
 export -f service::list
+export -f service::list_sub_services
 
 export -f service::clone
 export -f service::install
