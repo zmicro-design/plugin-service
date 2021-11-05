@@ -124,12 +124,12 @@ service::run() {
   # @TODO
   service::load_config $name
 
-  #@TODO
-  service::run_check $name
-  if [ "$?" != "0" ]; then
-    log::error "[service::run] service run check error"
-    exit 1
-  fi
+  # #@TODO
+  # service::run_check $name
+  # if [ "$?" != "0" ]; then
+  #   log::error "[service::run] service run check error"
+  #   exit 1
+  # fi
 
   cd $service_path
   docker-compose -f docker-compose.yml $commands
@@ -289,6 +289,13 @@ service::load_config() {
   # @TODO load global
   if [ -f "$SERVICE_CONFIG" ]; then
     config::load_file $SERVICE_CONFIG
+  fi
+
+  #@TODO
+  service::run_check $name
+  if [ "$?" != "0" ]; then
+    log::error "[service::run] service run check error"
+    exit 1
   fi
 }
 
