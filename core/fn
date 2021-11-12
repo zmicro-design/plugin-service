@@ -258,6 +258,7 @@ service::load_config() {
   fi
 
   # @TODO
+  export SERVICE_DIR=$(service::get_path $name)
   export SERVICE_DATA=$(service::get_data_path $name)
   export SERVICE_LOGS=$(service::get_logs_path $name)
   export SERVICE_CONFIGS=$(service::get_configs_path $name)
