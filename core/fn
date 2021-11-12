@@ -260,7 +260,8 @@ service::load_config() {
   # @TODO
   export SERVICE_DATA=$(service::get_data_path $name)
   export SERVICE_LOGS=$(service::get_logs_path $name)
-  export SERVICE_CONFIG=$(service::get_configs_path $name)/config
+  export SERVICE_CONFIGS=$(service::get_configs_path $name)
+  export SERVICE_CONFIG=$SERVICE_CONFIGS/config
 
   if [ -z "$SERVICE_DATA" ]; then
     log::error "[service::run] SERVICE_DATA is empty"
