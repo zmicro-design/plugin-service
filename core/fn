@@ -353,7 +353,9 @@ service::install() {
   service::clone $name $version
 
   # start service
-  service::run $name up -d
+  if [ "$SERVICE_AUTO_START" != "N" ]; then
+    service::run $name up -d
+  fi
 }
 
 service::remove() {

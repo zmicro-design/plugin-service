@@ -31,7 +31,10 @@ async function applyService(service, options) {
 
   if (!await isServiceExist(service.name)) {
     console.log(await $`log::info "[${service.name}] installing ..."`);
-    await $`zmicro service install ${service.name}`;
+    await runCommand(`SERVICE_AUTO_START=N zmicro service install ${service.name}`);
+  } else {
+    console.log(await $`log::info "[${service.name}] pulling ..."`);
+    await runCommand(`zmicro service pull_repo ${service.name}`);
   }
 
   // if (!['notion', 'vscode', 'portainer'].includes(service.name)) return;
@@ -39,14 +42,7 @@ async function applyService(service, options) {
   const action = options && options.action || 'start';
   console.log(await $`log::info "[${service.name}] ${action}ing ..."`);
   // await $`zmicro service start ${service.name}`;
-  await new Promise((resolve, reject) => {
-    const child = spawn(`zmicro service ${action} ${service.name}`, { shell: true, stdio: 'inherit' });
-    child.on('exit', (code) => {
-      if (code !== 0) return reject(`command error (${code})`);
-
-      resolve();
-    });
-  });
+  await runCommand(`zmicro service ${action} ${service.name}`);
 
   console.log(await $`log::info "[${service.name}] done .\n"`);
 }
@@ -66,7 +62,7 @@ async function createServiceConfig(service) {
   if (service.environment) {
     // console.log(`[${service.name}] environment:`, service.environment);
 
-    const envPrefix = `SERVICE_${service.name.toUpperCase()}`;
+    const envPrefix = `SERVICE_${service.name.replace(/-/g, '_').toUpperCase()}`;
     const env = [];
     for (const key in service.environment) {
       const envKey = `${envPrefix}_${key}`;
@@ -80,6 +76,18 @@ async function createServiceConfig(service) {
   if (service.config) {
     await fs.yml.write(configYmlPath, service.config);
   }
+}
+
+async function runCommand(command) {
+  return await new Promise((resolve, reject) => {
+    const child = spawn(command, { shell: true, stdio: 'inherit' });
+    child.on('exit', (code) => {
+      if (code !== 0) return reject(`command (${command}) error (${code})`);
+
+      resolve();
+    });
+  });
+
 }
 
 async function main() {
