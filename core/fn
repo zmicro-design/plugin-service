@@ -110,12 +110,13 @@ service::list_sub_services() {
 service::run() {
   local name=$1
   local commands=${@:2}
+  local service_path=$(service::get_path $name)
 
   log::debug "[$(timestamp)][service] PLUGIN_SERVICE_SERVICES: $PLUGIN_SERVICE_SERVICES"
   log::debug "[$(timestamp)][service] service name: $name"
+  log::debug "[$(timestamp)][service] service path: $service_path"
   log::debug "[$(timestamp)][service] service command: $commands"
 
-  local service_path=$(service::get_path $name)
   if [ "$service_path" = "" ]; then
     log::error "[$(timestamp)][service] service($name) not found"
     exit 1
@@ -132,6 +133,7 @@ service::run() {
   # fi
 
   cd $service_path
+  log::debug "[$(timestamp)][service] docker-compose -f docker-compose.yml $commands"
   docker-compose -f docker-compose.yml $commands
 }
 
@@ -425,6 +427,10 @@ service::description() {
   echo $DESCRIPTION
 }
 
+service::apply() {
+  run::js $ZMICRO_PLUGINS_PATH/service/core/js/apply.js "$@"
+}
+
 export -f service::get_dirs
 export -f service::get_path
 
@@ -455,3 +461,5 @@ export -f service::description
 
 export -f service::run_check
 export -f service::run_check_ok
+
+export -f service::apply
