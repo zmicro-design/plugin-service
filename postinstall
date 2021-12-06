@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $ZMICRO_PLUGINS_PATH/service/core/js
+yarn
