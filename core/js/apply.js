@@ -65,7 +65,15 @@ async function createServiceConfig(service) {
     const envPrefix = `SERVICE_${service.name.replace(/-/g, '_').toUpperCase()}`;
     const env = [];
     for (const key in service.environment) {
-      const envKey = `${envPrefix}_${key}`;
+      let envKey = key;
+
+      // if key start with _, it means use no prefix
+      if (!/^_/.test(key)) {
+        envKey = `${envPrefix}_${key}`;
+      } else {
+        envKey = key.slice(1);
+      }
+    
       const envValue = service.environment[key];
       env.push(`${envKey}=${envValue}`);
     }
