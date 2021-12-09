@@ -13,6 +13,19 @@ async function apply(configFile = DEFAULT_SERVICE_CONFIG, options) {
     throw new Error(`services is required`);
   }
 
+  if (options.name) {
+    if (!config.services[options.name]) {
+      throw new Error(`unknown service named ${options.name}`);
+    }
+
+    const service = {
+      ...config.services[options.name],
+      name: options.name,
+    };
+
+    return await applyService(service, { ...options, cwd }); 
+  }
+
   for (const name in config.services) {
     const service = {
       ...config.services[name],
@@ -104,6 +117,7 @@ async function main() {
 
   let config = args.f || args.config || DEFAULT_SERVICE_CONFIG;
   let action = args.a || args.action || 'start';
+  let name = args.n || args.name;
 
   if (typeof config !== 'string') {
     throw new Error(`invalid service apply config`);
@@ -117,7 +131,7 @@ async function main() {
     config = path.join(process.cwd(), config);
   }
 
-  await apply(config, { action });
+  await apply(config, { action, name });
 }
 
 main()
