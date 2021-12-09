@@ -88,7 +88,7 @@ async function createServiceConfig(service) {
       }
     
       const envValue = service.environment[key];
-      env.push(`${envKey}=${envValue}`);
+      env.push(`${envKey}="${envValue}"`);
     }
 
     await fs.writeFile(configEnvPath, env.join('\n'));
