@@ -14,7 +14,7 @@ core() {
     exit 0
   fi
 
-  local service_name=$1
+  local name=$1
   local args=${@:2}
 
   service::update $name $args

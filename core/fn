@@ -387,6 +387,8 @@ service::update() {
 
   # pull
   service::run $name pull $args
+  # build
+  service::build $service_name
   # rollup
   service::run $name down $args
   service::run $name up -d $args
@@ -425,12 +427,39 @@ service::description() {
   echo $DESCRIPTION
 }
 
+service::get_image_path() {
+  local name=$1
+   if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service::image] name is required"
+    exit 1
+  fi
+
+  local service_path=$(service::get_path $name)
+  echo $service_path/image/Dockerfile
+}
+
+service::build() {
+  local name=$1
+  local args=${@:2}
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service::get_mod_path] name is required"
+    exit 1
+  fi
+
+  local dockerfile=$(service::get_image_path $name)
+  if [ -f "$dockerfile" ]; then
+    # log::info "Build image ..."
+    service::run $name build $args
+  fi
+}
+
 export -f service::get_dirs
 export -f service::get_path
 
 export -f service::get_mod_path
 export -f service::get_config_path
 export -f service::get_repo_url
+export -f service::get_image_path
 
 export -f service::get_config
 
@@ -449,6 +478,8 @@ export -f service::clone
 export -f service::install
 export -f service::remove
 export -f service::update
+
+export -f service::build
 
 export -f service::version
 export -f service::description
