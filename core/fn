@@ -99,6 +99,11 @@ service::list_sub_services() {
     log::error "[$(timestamp)][service] service($name) not found"
     exit 1
   fi
+
+  if [ ! -d "$service_path" ]; then
+    log::error "[$(timestamp)][service] service($name) not found"
+    exit 1
+  fi
   
   # @TODO
   service::load_config $name
@@ -110,13 +115,19 @@ service::list_sub_services() {
 service::run() {
   local name=$1
   local commands=${@:2}
+  local service_path=$(service::get_path $name)
 
   log::debug "[$(timestamp)][service] PLUGIN_SERVICE_SERVICES: $PLUGIN_SERVICE_SERVICES"
   log::debug "[$(timestamp)][service] service name: $name"
+  log::debug "[$(timestamp)][service] service path: $service_path"
   log::debug "[$(timestamp)][service] service command: $commands"
 
-  local service_path=$(service::get_path $name)
   if [ "$service_path" = "" ]; then
+    log::error "[$(timestamp)][service] service($name) not found"
+    exit 1
+  fi
+
+  if [ ! -d "$service_path" ]; then
     log::error "[$(timestamp)][service] service($name) not found"
     exit 1
   fi
@@ -132,6 +143,7 @@ service::run() {
   # fi
 
   cd $service_path
+  log::debug "[$(timestamp)][service] docker-compose -f docker-compose.yml $commands"
   docker-compose -f docker-compose.yml $commands
 }
 
@@ -253,12 +265,17 @@ service::load_mod() {
 service::load_config() {
   local name=$1
   if [ -z "$name" ]; then
-    log::error "[$(timestamp)][service::load_mod] name is required"
+    log::error "[$(timestamp)][service::load_config] name is required"
     exit 1
   fi
 
   # @TODO
   export SERVICE_DIR=$(service::get_path $name)
+  if [ ! -d "$SERVICE_DIR" ]; then
+    log::error "[$(timestamp)][service::load_config] service is not invalid"
+    exit 1
+  fi
+
   export SERVICE_DATA=$(service::get_data_path $name)
   export SERVICE_LOGS=$(service::get_logs_path $name)
   export SERVICE_CONFIGS=$(service::get_configs_path $name)
@@ -351,7 +368,9 @@ service::install() {
   service::clone $name $version
 
   # start service
-  service::run $name up -d
+  if [ "$SERVICE_AUTO_START" != "N" ]; then
+    service::run $name up -d
+  fi
 }
 
 service::remove() {
@@ -453,6 +472,10 @@ service::build() {
   fi
 }
 
+service::apply() {
+  run::js $ZMICRO_PLUGINS_PATH/service/core/js/apply.js "$@"
+}
+
 export -f service::get_dirs
 export -f service::get_path
 
@@ -486,3 +509,5 @@ export -f service::description
 
 export -f service::run_check
 export -f service::run_check_ok
+
+export -f service::apply
