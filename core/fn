@@ -448,6 +448,16 @@ service::apply() {
   run::js $ZMICRO_PLUGINS_PATH/service/core/js/apply.js "$@"
 }
 
+service::version_echo() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service][version_echo] service name is required"
+    exit 1
+  fi
+
+  version::service $name
+}
+
 export -f service::get_dirs
 export -f service::get_path
 
@@ -480,3 +490,5 @@ export -f service::run_check
 export -f service::run_check_ok
 
 export -f service::apply
+
+export -f service::version_echo

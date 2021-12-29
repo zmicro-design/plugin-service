@@ -9,20 +9,13 @@ help() {
 }
 
 core() {
-  local service=$1
-  if [ "$service" = "" ]; then
-    log::error "service is required"
+  local name=$1
+  if [ "$name" = "" ]; then
+    log::error "service name is required"
     exit 1
   fi
 
-  cd $SWARM_PLUGIN_SERVICE_PATH/$service
-  if [ ! -f .env ]; then
-    log::error "Please use .env instead of write all config in docker-compose.yml"
-    exit 1
-  fi
-
-  . .env
-  echo $VERSION
+  service::version_echo $name
 }
 
 run() {
