@@ -13,6 +13,8 @@ async function apply(configFile = DEFAULT_SERVICE_CONFIG, options) {
     throw new Error(`services is required`);
   }
 
+  await applyNetworks(config.networks);
+
   if (options.name) {
     if (!config.services[options.name]) {
       throw new Error(`unknown service named ${options.name}`);
@@ -23,30 +25,74 @@ async function apply(configFile = DEFAULT_SERVICE_CONFIG, options) {
       name: options.name,
     };
 
-    return await applyService(service, { ...options, cwd }); 
+    return await applyService(service, config.networks, { ...options, cwd }); 
   }
 
-  for (const name in config.services) {
-    const service = {
-      ...config.services[name],
+  await applyServices(config.services, config.networks, { ...options, cwd })
+}
+
+async function applyNetworks(networks) {
+  if (!networks) {
+    throw new Error('networks is required');
+  }
+
+  console.log(await $`log::info "applying networks ..."`);
+  const systemNetworks = await getSystemNetworks();
+
+  for (const name in networks) {
+    const network = {
       name,
+      ...networks[name],
     };
 
-    await applyService(service, { ...options, cwd });
+    await applyNetwork(network, systemNetworks);
   }
 }
 
-async function applyService(service, options) {
+async function applyNetwork(network, systemNetworks) {
+  const { name, driver = 'bridge' } = network
+
+  if (systemNetworks[name]) {
+    // console.log(await $`log::info "network ${name} found ..."`);
+    return ;
+  }
+
+  console.log(await $`log::info "create network ${name} ..."`);
+  try {
+    await $`docker network create -d ${driver} ${name}`;
+    console.log(await $`log::success "success create network ${name}."`);
+  } catch (error) {
+    console.log(await $`log::error "failed to create network ${name} (${error.message})"`);
+  }
+}
+
+async function applyServices(services, networks, options) {
+  if (!services || !networks) {
+    console.log(await $`log::info "services and networks is required ..."`);
+  }
+
+  console.log(await $`log::info "applying services ..."`);
+  for (const name in services) {
+    const service = {
+      ...services[name],
+      name,
+    };
+
+    await applyService(service, networks, options);
+  }
+}
+
+async function applyService(service, networks, options) {
   console.log(await $`log::info "[${service.name}] applying service ..."`);
 
-  console.log(await $`log::info "[${service.name}] updating config ..."`);
-  await createServiceConfig(service);
+  // console.log(await $`log::info "[${service.name}] updating config ..."`);
+  await applyServiceConfig(service, networks);
 
   if (!await isServiceExist(service.name)) {
-    console.log(await $`log::info "[${service.name}] installing ..."`);
+    console.log(await $`log::info "[${service.name}] apply installing ..."`);
     await runCommand(`SERVICE_AUTO_START=N zmicro service install ${service.name}`);
   } else {
-    console.log(await $`log::info "[${service.name}] pulling ..."`);
+    console.log(await $`log::info "[${service.name}] apply updating ..."`);
     await runCommand(`zmicro service pull_repo ${service.name}`);
   }
 
@@ -65,19 +111,30 @@ async function isServiceExist(name) {
   return fs.exist(serviceDir);
 }
 
-async function createServiceConfig(service) {
+async function applyServiceConfig(service, networks) {
   const configDir = `/configs/plugins/service/config/${service.name}`;
   const configEnvPath = `${configDir}/config`;
   const configYmlPath = `${configDir}/config.yml`;
 
   await fs.mkdirp(configDir);
 
-  if (service.environment) {
-    // console.log(`[${service.name}] environment:`, service.environment);
+  const network = await getServiceNetwork(service.name, service.network, networks);
+  const environment = {
+    ...service.environment,
+    network,
+  };
 
-    const envPrefix = `SERVICE_${service.name.replace(/-/g, '_').toUpperCase()}`;
+  await applyServiceConfigEnvironment(service.name, environment, configEnvPath);
+
+  await applyServiceConfigConfig(service.name, service.config, configYmlPath);
+}
+
+async function applyServiceConfigEnvironment(serviceName, environment, filepath) {
+  console.log(await $`log::info "[${serviceName}] applying service environment ..."`);
+
+  const envPrefix = `SERVICE_${serviceName.replace(/-/g, '_').toUpperCase()}`;
     const env = [];
-    for (const key in service.environment) {
+    for (const key in environment) {
       let envKey = key;
 
       // if key start with _, it means use no prefix
@@ -87,16 +144,37 @@ async function createServiceConfig(service) {
         envKey = key.slice(1);
       }
     
-      const envValue = service.environment[key];
+      const envValue = environment[key];
       env.push(`${envKey}="${envValue}"`);
     }
 
-    await fs.writeFile(configEnvPath, env.join('\n'));
+    await fs.writeFile(filepath, env.join('\n'));
+}
+
+async function applyServiceConfigConfig(serviceName, config, filepath) {
+  console.log(await $`log::info "[${serviceName}] applying service config ..."`);
+
+  if (config) {
+    return ; 
   }
 
-  if (service.config) {
-    await fs.yml.write(configYmlPath, service.config);
+  await fs.yml.write(filepath, config);
+}
+
+async function getServiceNetwork(serviceName, serviceNetworkName, networks) {
+  debug('[debug] networks:', networks)
+
+  console.log(await $`log::info "[${serviceName}] applying service network ..."`);
+
+  if (!serviceNetworkName) {
+    return networks.default.name;
   }
+
+  if (!networks[serviceNetworkName]) {
+    throw new Error(`service network is not vaild, should be one of ${Object.keys(networks)}`);
+  }
+
+  return serviceNetworkName;
 }
 
 async function runCommand(command) {
@@ -108,7 +186,40 @@ async function runCommand(command) {
       resolve();
     });
   });
+}
 
+async function getSystemNetworks() {
+  const raw = await $`docker network ls`;
+  
+  debug('system networks:', raw);
+
+  const lines = raw.split('\n').slice(1);
+  const items = lines.map(_line => {
+    const line = _line.replace(/\s+/g, ' ')
+    const parts = line.split(' ');
+    const id = parts[0].trim();
+    const name = parts[1].trim();
+    const driver = parts[2].trim();
+    const scope = parts[3].trim();
+
+    return {
+      id,
+      name,
+      driver,
+      scope,
+    };
+  });
+
+  return items.reduce((all, item) => {
+    all[item.name] = item;
+    return all;
+  }, {})
+}
+
+function debug(...message) {
+  if (process.env.DEBUG) {
+    console.log('[DEBUG]', ...message);
+  }
 }
 
 async function main() {
@@ -136,7 +247,8 @@ async function main() {
 
 main()
   .catch(error => {
-    // console.error('apply error', error);
+    debug('apply error', error);
+    
     console.error('apply error', error.message);
     
     process.exit(1);

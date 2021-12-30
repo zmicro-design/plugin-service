@@ -1,0 +1,72 @@
+version: '0.0.1'
+
+services:
+  # Ingress
+  ingress:
+    version: v0.0.1
+    config:
+      ssl:
+        - domain: example.com
+          cert:
+            certificate: /path/to/example.com/fullchain.pem
+            certificate_key: /path/to/example.com/privkey.pem
+      rules:
+        - host: portainer.example.com
+          backend:
+            serviceName: portainer
+            servicePort: 80
+    environment:
+      DOMAIN: example.com
+    network: xxxx
+
+  # Database
+  postgres:
+    version: v0.0.1
+    environment:
+      USERNAME: # <CHANGE_IT>
+      PASSWORD: # <CHANGE_IT>
+      DB: postgres
+
+  mongo:
+    version: v0.0.1
+    environment:
+      USERNAME: # <CHANGE_IT>
+      PASSWORD: # <CHANGE_IT>
+      DB: mongo
+
+  redis:
+    version: v0.0.1
+    environment:
+      SECRET: # <CHANGE_IT>
+
+  # Container
+  portainer:
+    version: v0.0.1
+    environment:
+      DOMAIN: portainer.example.com
+      DOREAMON_CLIENT_ID: # <CHANGE_IT>
+      DOREAMON_CLIENT_SECRET: # <CHANGE_IT>
+      ALLOW_USERNAMES: # <CHANGE_IT>
+
+  # CI/CD
+  git:
+    version: v0.0.2
+    environment:
+      DOMAIN: git.example.com
+      DRONE_DOMAIN: cicd.example.com
+      DRONE_RPC_SECRET: # <CHANGE_IT>
+      DRONE_ADMIN_USER: # <CHANGE_IT>
+
+  drone:
+    version: v0.0.1
+    environment:
+      DOMAIN: cicd.example.com
+      GOGS_DOMAIN: cicd.example.com
+      RPC_SECRET: # <CHANGE_IT>
+      ADMIN_USER: # <CHANGE_IT>
+
+networks:
+  default:
+    name: compose-ingress
+  another_network:
+    name: another_network
