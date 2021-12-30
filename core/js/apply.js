@@ -121,7 +121,7 @@ async function applyServiceConfig(service, networks) {
   const network = await getServiceNetwork(service.name, service.network, networks);
   const environment = {
     ...service.environment,
-    network,
+    _SERVICE_NETWORK: network, //
   };
 
   await applyServiceConfigEnvironment(service.name, environment, configEnvPath);

@@ -24,6 +24,8 @@ core() {
   # 滚动更新
   # pull latest, make it as rolling update
   service::run $service_name pull
+  # 检查是否需要 Build，有 image 目录
+  service::build $service_name
 
   # stop
   service::run $service_name down
