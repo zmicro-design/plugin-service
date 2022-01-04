@@ -407,7 +407,7 @@ service::update() {
   # pull
   service::run $name pull $args
   # build
-  service::build $service_name
+  service::build $name
   # rollup
   service::run $name down $args
   service::run $name up -d $args
