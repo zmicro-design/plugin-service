@@ -219,7 +219,7 @@ async function getSystemNetworks() {
   }, {})
 }
 
-async function parseServiceUse(service) {
+function parseServiceUse(service) {
   const use = {
     image: service.name,
     version: 'master',
