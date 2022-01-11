@@ -19,12 +19,14 @@ core() {
   fi
 
   # @TODO
-  local version=""
+  local version=$2
+  local alias_=$3
   if [ "$2" = "-v" ]; then
     version=$3
+    alias_=$4
   fi
 
-  service::install $name $version
+  service::install $name $version $alias_
 }
 
 run() {

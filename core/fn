@@ -321,6 +321,7 @@ service::load_config() {
 service::clone() {
   local name=$1
   local version=$2
+  local alias_=$3
 
   if [ -z "$name" ]; then
     log::error "[$(timestamp)][service::clone] name is required"
@@ -331,7 +332,11 @@ service::clone() {
     version=master
   fi
 
-  local service_path=$(service::get_path $name)
+  if [ -z "$alias_" ]; then
+    alias_=$name
+  fi
+
+  local service_path=$(service::get_path $alias_)
   local service_repo_url=$(service::get_repo_url $name)
   if [ ! -d "$service_path" ]; then
     curl -I $service_repo_url 2>>/dev/null | head -n 1 | grep 404 >>/dev/null 2>&1
@@ -359,13 +364,18 @@ service::clone() {
 service::install() {
   local name=$1
   local version=$2
+  local alias_=$3
   if [ -z "$name" ]; then
     log::error "[$(timestamp)][service::install] name is required"
     exit 1
   fi
 
+  if [ -z "$alias_" ]; then
+    alias_=$name
+  fi
+
   # download
-  service::clone $name $version
+  service::clone $name $version $alias_
 
   # start service
   if [ "$SERVICE_AUTO_START" != "N" ]; then

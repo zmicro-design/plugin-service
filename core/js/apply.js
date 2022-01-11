@@ -84,22 +84,37 @@ async function applyServices(services, networks, options) {
 
 async function applyService(service, networks, options) {
   console.log(await $`log::info "[${service.name}] applying service ..."`);
+  const use = {
+    image: service.name,
+    version: 'master',
+  };
+  if (service.use) {
+    const _use = service.use.split('@');
+    if (_use && _use[0]) {
+      use.image = use[0];
+    }
+
+    if (_use && _use[1]) {
+      use.version = use[1];
+    }
+  }
+
 
   // console.log(await $`log::info "[${service.name}] updating config ..."`);
   await applyServiceConfig(service, networks);
 
   if (!await isServiceExist(service.name)) {
-    console.log(await $`log::info "[${service.name}] apply installing ..."`);
-    await runCommand(`SERVICE_AUTO_START=N zmicro service install ${service.name}`);
+    console.log(await $`log::info "[${service.name}][image: ${use.image}] apply installing ..."`);
+    await runCommand(`SERVICE_AUTO_START=N zmicro service install ${use.image} ${use.version} ${service.name}`);
   } else {
-    console.log(await $`log::info "[${service.name}] apply updating ..."`);
-    await runCommand(`zmicro service pull_repo ${service.name}`);
+    console.log(await $`log::info "[${service.name}][image: ${use.image}] apply updating ..."`);
+    await runCommand(`zmicro service pull_repo ${use.image} ${use.version} ${service.name}`);
   }
 
   // if (!['notion', 'vscode', 'portainer'].includes(service.name)) return;
 
   const action = options && options.action || 'start';
-  console.log(await $`log::info "[${service.name}] ${action}ing ..."`);
+  console.log(await $`log::info "[${service.name}][image: ${use.image}] ${action}ing ..."`);
   // await $`zmicro service start ${service.name}`;
   await runCommand(`zmicro service ${action} ${service.name}`);
 
