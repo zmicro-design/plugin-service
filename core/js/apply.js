@@ -83,22 +83,10 @@ async function applyServices(services, networks, options) {
 }
 
 async function applyService(service, networks, options) {
-  console.log(await $`log::info "[${service.name}] applying service ..."`);
-  const use = {
-    image: service.name,
-    version: 'master',
-  };
-  if (service.use) {
-    const _use = service.use.split('@');
-    if (_use && _use[0]) {
-      use.image = use[0];
-    }
+  // @TODO
+  service.use = parseServiceUse(service);
 
-    if (_use && _use[1]) {
-      use.version = use[1];
-    }
-  }
-
+  console.log(await $`log::info "[${service.name}][image: ${use.image}] applying service ..."`);
 
   // console.log(await $`log::info "[${service.name}] updating config ..."`);
   await applyServiceConfig(service, networks);
@@ -139,7 +127,7 @@ async function applyServiceConfig(service, networks) {
     _SERVICE_NETWORK: network, //
   };
 
-  await applyServiceConfigEnvironment(service.name, environment, configEnvPath);
+  await applyServiceConfigEnvironment(service.use.image, environment, configEnvPath);
 
   await applyServiceConfigConfig(service.name, service.config, configYmlPath);
 }
@@ -229,6 +217,26 @@ async function getSystemNetworks() {
     all[item.name] = item;
     return all;
   }, {})
+}
+
+async function parseServiceUse(service) {
+  const use = {
+    image: service.name,
+    version: 'master',
+  };
+
+  if (service.use) {
+    const _use = service.use.split('@');
+    if (_use && _use[0]) {
+      use.image = _use[0];
+    }
+
+    if (_use && _use[1]) {
+      use.version = _use[1];
+    }
+  }
+
+  return use;
 }
 
 function debug(...message) {
