@@ -156,11 +156,11 @@ async function applyServiceConfigEnvironment(serviceName, environment, filepath)
 }
 
 async function applyServiceConfigConfig(serviceName, config, filepath) {
-  console.log(await $`log::info "[${serviceName}] applying service config ..."`);
-
-  if (config) {
+  if (!config) {
     return ; 
   }
+
+  console.log(await $`log::info "[${serviceName}] applying service config ..."`);
 
   await fs.yml.write(filepath, config);
 }
