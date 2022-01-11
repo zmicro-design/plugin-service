@@ -86,27 +86,27 @@ async function applyService(service, networks, options) {
   // @TODO
   service.use = parseServiceUse(service);
 
-  console.log(await $`log::info "[${service.name}][image: ${use.image}] applying service ..."`);
+  console.log(await $`log::info "[${service.name}][image: ${service.use.image}] applying service ..."`);
 
   // console.log(await $`log::info "[${service.name}] updating config ..."`);
   await applyServiceConfig(service, networks);
 
   if (!await isServiceExist(service.name)) {
-    console.log(await $`log::info "[${service.name}][image: ${use.image}] apply installing ..."`);
-    await runCommand(`SERVICE_AUTO_START=N zmicro service install ${use.image} ${use.version} ${service.name}`);
+    console.log(await $`log::info "[${service.name}][image: ${service.use.image}] apply installing ..."`);
+    await runCommand(`SERVICE_AUTO_START=N zmicro service install ${service.use.image} ${service.use.version} ${service.name}`);
   } else {
-    console.log(await $`log::info "[${service.name}][image: ${use.image}] apply updating ..."`);
-    await runCommand(`zmicro service pull_repo ${use.image} ${use.version} ${service.name}`);
+    console.log(await $`log::info "[${service.name}][image: ${service.use.image}] apply updating ..."`);
+    await runCommand(`zmicro service pull_repo ${service.use.image} ${service.use.version} ${service.name}`);
   }
 
   // if (!['notion', 'vscode', 'portainer'].includes(service.name)) return;
 
   const action = options && options.action || 'start';
-  console.log(await $`log::info "[${service.name}][image: ${use.image}] ${action}ing ..."`);
+  console.log(await $`log::info "[${service.name}][image: ${service.use.image}] ${action}ing ..."`);
   // await $`zmicro service start ${service.name}`;
   await runCommand(`zmicro service ${action} ${service.name}`);
 
-  console.log(await $`log::info "[${service.name}] done .\n"`);
+  console.log(await $`log::info "[${service.name}][image: ${service.use.image}] done .\n"`);
 }
 
 async function isServiceExist(name) {
