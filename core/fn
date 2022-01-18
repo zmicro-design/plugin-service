@@ -308,6 +308,11 @@ service::load_config() {
   # @TODO load global
   if [ -f "$SERVICE_CONFIG" ]; then
     config::load_file $SERVICE_CONFIG
+
+    # @TODO
+    if [ -n "$SERVICE_NETWORK" ]; then
+      export SERVICE_NETWORK=$SERVICE_NETWORK
+    fi
   fi
 
   #@TODO
