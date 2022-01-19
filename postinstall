@@ -1,4 +1,10 @@
 #!/bin/bash
 
 cd $ZMICRO_PLUGINS_PATH/service/core/js
+
+which yarn >> /dev/null 2>&1
+if [ "$?" != "0" ]; then
+  npm i -g yarn
+fi
+
 yarn
