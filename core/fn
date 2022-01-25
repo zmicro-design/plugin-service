@@ -375,6 +375,10 @@ service::install() {
     exit 1
   fi
 
+  if [ -z "$version" ]; then
+    version=master
+  fi
+
   if [ -z "$alias_" ]; then
     alias_=$name
   fi
