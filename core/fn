@@ -502,7 +502,7 @@ service::has_images() {
   fi
 
   local service_path=$(service::get_path $name)
-  if [ -d "$service_path/image" ]; then
+  if [ -d "$service_path/images" ]; then
     echo "true"
   else
     echo "false"
