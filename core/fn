@@ -357,9 +357,19 @@ service::clone() {
     fi
   else
     cd $service_path
-    git pull origin master >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+    local current_tag=$(git describe --tags)
+    if [ "$current_tag" != "$version" ]; then
+      git checkout $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+      if [ "$?" != "0" ]; then
+        echo "[$(timestamp)][service::clone] git checkout error ${name} ..."
+        tail -n 50 $ZMICRO_LOG_ERROR_PATH
+        exit -1
+      fi
+    fi
+
+    git pull origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
     if [ "$?" != "0" ]; then
-      echo "[$(timestamp)][service::clone] update service repo ${name} ..."
+      echo "[$(timestamp)][service::clone] git pull error ${name} ..."
       tail -n 50 $ZMICRO_LOG_ERROR_PATH
       exit -1
     fi
