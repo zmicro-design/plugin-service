@@ -1,0 +1,33 @@
+#!/bin/bash
+
+help() {
+  echo "Usage:"
+  echo "  zservice update <service_name> [options...]"
+  # echo ""
+  # echo "    -h, --help              Get help"
+  # echo "    -u, --update <version>  Set new version"
+}
+
+core() {
+   if [ "$1" = "" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+
+  local name=$1
+  local version=$2
+
+  if [ -z "$name" ] || [ -z "$version" ]; then
+    log::error "name and version are required"
+    exit 1
+  fi
+
+  zmicro service pull_repo $name $version
+  zmicro service restart $name
+}
+
+run() {
+  core $@
+}
+
+run $@

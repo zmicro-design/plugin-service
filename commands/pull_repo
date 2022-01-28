@@ -11,10 +11,15 @@ core() {
     exit 0
   fi
 
-  local service_name=$1
+  local name=$1
   local args=${@:2}
 
-  service::clone $service_name $args
+  if [ -z "$name" ]; then
+    log::error "name is required"
+    exit 1
+  fi
+
+  service::clone $name $args
 }
 
 run() {
