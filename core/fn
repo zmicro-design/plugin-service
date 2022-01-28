@@ -494,6 +494,21 @@ service::get_image_path() {
   echo $service_path/image/Dockerfile
 }
 
+service::has_images() {
+  local name=$1
+   if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service::image] name is required"
+    exit 1
+  fi
+
+  local service_path=$(service::get_path $name)
+  if [ -d "$service_path/image" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 service::build() {
   local name=$1
   local args=${@:2}
@@ -502,8 +517,7 @@ service::build() {
     exit 1
   fi
 
-  local dockerfile=$(service::get_image_path $name)
-  if [ -f "$dockerfile" ]; then
+  if [ "$(service::has_images $name)" = "true" ]; then
     # log::info "Build image ..."
     service::run $name build $args
   fi
@@ -530,6 +544,7 @@ export -f service::get_mod_path
 export -f service::get_config_path
 export -f service::get_repo_url
 export -f service::get_image_path
+export -f service::has_images
 
 export -f service::get_config
 

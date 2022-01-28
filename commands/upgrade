@@ -23,6 +23,7 @@ core() {
   fi
 
   zmicro service pull_repo $name $version
+  # service::run $name build
   zmicro service restart $name
 }
 
