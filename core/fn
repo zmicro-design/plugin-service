@@ -366,7 +366,7 @@ service::clone() {
         exit -1
       fi
 
-      git checkout $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+      git checkout -b $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
       if [ "$?" != "0" ]; then
         echo "[$(timestamp)][service::clone] git checkout error ${name} ..."
         tail -n 50 $ZMICRO_LOG_ERROR_PATH
