@@ -92,10 +92,10 @@ async function applyService(service, networks, options) {
   await applyServiceConfig(service, networks);
 
   if (!await isServiceExist(service.name)) {
-    console.log(await $`log::info "[${service.name}][image: ${service.use.image}] apply installing ..."`);
+    console.log(await $`log::info "[${service.name}][image: ${service.use.image}] applying install version(${service.use.version}) ..."`);
     await runCommand(`SERVICE_AUTO_START=N zmicro service install ${service.use.image} ${service.use.version} ${service.name}`);
   } else {
-    console.log(await $`log::info "[${service.name}][image: ${service.use.image}] apply updating ..."`);
+    console.log(await $`log::info "[${service.name}][image: ${service.use.image}] applying update version(${service.use.version}) ..."`);
     await runCommand(`zmicro service pull_repo ${service.use.image} ${service.use.version} ${service.name}`);
   }
 
