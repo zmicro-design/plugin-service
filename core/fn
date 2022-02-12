@@ -358,7 +358,7 @@ service::clone() {
   else
     cd $service_path
     local current_tag=$(git describe --tags)
-    if [ "$current_tag" != "$version" ]; then
+    if [ "$current_tag" != "$version" ] && [ "$version" != "master" ]; then
       # git fetch origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
       git fetch origin >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
       if [ "$?" != "0" ]; then
