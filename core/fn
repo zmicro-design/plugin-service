@@ -504,6 +504,8 @@ service::has_images() {
   local service_path=$(service::get_path $name)
   if [ -d "$service_path/images" ]; then
     echo "true"
+  elif [ -d "$service_path/image" ]; then
+    echo "true"
   else
     echo "false"
   fi
