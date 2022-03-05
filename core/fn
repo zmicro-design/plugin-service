@@ -195,7 +195,7 @@ service::get_data_path() {
 
   local path="$PLUGIN_SERVICE_DATA/$name"
   if [ ! -d "$path" ]; then
-    if [ ! -w "PLUGIN_SERVICE_DATA" ]; then
+    if [ ! -w "$PLUGIN_SERVICE_DATA" ]; then
       sudo mkdir -p $path
       sudo chown $USER $path
     else
@@ -215,7 +215,7 @@ service::get_logs_path() {
 
   local path="$PLUGIN_SERVICE_LOGS/$name"
   if [ ! -d "$path" ]; then
-    if [ ! -w "PLUGIN_SERVICE_DATA" ]; then
+    if [ ! -w "$PLUGIN_SERVICE_LOGS" ]; then
       sudo mkdir -p $path
       sudo chown $USER $path
     else
@@ -235,7 +235,7 @@ service::get_configs_path() {
 
   local path="$PLUGIN_SERVICE_CONFIGS/$name"
   if [ ! -d "$path" ]; then
-    if [ ! -w "PLUGIN_SERVICE_DATA" ]; then
+    if [ ! -w "$PLUGIN_SERVICE_CONFIGS" ]; then
       sudo mkdir -p $path
       sudo chown $USER $path
     else
