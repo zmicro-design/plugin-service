@@ -26,8 +26,10 @@ core() {
 
   local service_env_path=$service_path/.env
   if [ ! -f $service_env_path ]; then
-    log::error "service($service_name) .env file not found"
-    exit 1
+    # log::error "service($service_name) .env file not found"
+    # exit 1
+    # @TODO
+    service_env_path=$ZMICRO_APP_CONFIGS_PATH/plugins/service/config/$service_name/config
   fi
 
   # @TODO
