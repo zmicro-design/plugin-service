@@ -43,7 +43,7 @@ core() {
   fi
 
   if [ "${edit}" = "true" ]; then
-    local config_path=$(service::get_config_path $service_name)
+    local config_path=$(service::get_configs_path $service_name)/config
     vim $config_path
     exit 0
   fi
