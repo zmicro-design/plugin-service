@@ -18,6 +18,16 @@ core() {
   local service_name=$1
   local args=${@:2}
 
+  local edit=false
+  if [ -z "${service_name}" ]; then
+    log::error "service name is required"
+    exit 1
+  fi
+
+  if [ "${args}" = "--edit" ]; then
+    edit=true
+  fi
+
   local service_path=$(service::get_path $service_name)
   if [ "$service_path" = "" ]; then
     log::error "[$(timestamp)][service][env] service($service_name) not found"
@@ -29,7 +39,13 @@ core() {
     # log::error "service($service_name) .env file not found"
     # exit 1
     # @TODO
-    service_env_path=$ZMICRO_APP_CONFIGS_PATH/plugins/service/config/$service_name/config
+    service_env_path=$(service::get_config_path $service_name)
+  fi
+
+  if [ "${edit}" = "true" ]; then
+    local config_path=$(service::get_config_path $service_name)
+    vim $config_path
+    exit 0
   fi
 
   # @TODO
