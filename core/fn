@@ -129,7 +129,10 @@ service::run() {
 
   if [ ! -d "$service_path" ]; then
     log::error "[$(timestamp)][service] service($name) not found"
-    exit 1
+    # exit 1
+    log::info "[$(timestamp)][service] try to install service($name) ..."
+    service::install $name
+    return
   fi
 
   # @TODO
