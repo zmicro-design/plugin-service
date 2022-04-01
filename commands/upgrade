@@ -2,10 +2,13 @@
 
 help() {
   echo "Usage:"
-  echo "  zservice update <service_name> [options...]"
+  echo "  zservice upgrade <service_name> <version> [options...]"
   # echo ""
   # echo "    -h, --help              Get help"
   # echo "    -u, --update <version>  Set new version"
+  echo ""
+  echo "Example:"
+  echo "  zservice upgrade ingress v1.0.0"
 }
 
 core() {
@@ -22,9 +25,15 @@ core() {
     exit 1
   fi
 
-  zmicro service pull_repo $name $version
-  # service::run $name build
-  zmicro service restart $name
+  # 1. [stop] stop the origin service
+  #   why should we stop the origin service?
+  #     - because service code (docker-compose.yml) may be changed
+  #     - maybe services are not the names, so we need to stop all services first
+  #     - it doesnot like update date service image only
+  zmicro service stop $name
+
+  # 1. [switch] switch the specified version
+  zmicro service switch $name $version
 }
 
 run() {

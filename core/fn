@@ -336,6 +336,23 @@ service::load_config() {
   config::export $SERVICE_CONFIG
 }
 
+service::switch() {
+  local name=$1
+  local version=$2
+
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service::switch] name is required"
+    exit 1
+  fi
+
+  if [ -z "$version" ]; then
+    log::error "[$(timestamp)][service::switch] version is required"
+    exit 1
+  fi
+
+  service::clone $name $version
+}
+
 service::clone() {
   local name=$1
   local version=$2
@@ -575,6 +592,8 @@ export -f service::list
 export -f service::list_sub_services
 
 export -f service::clone
+export -f service::switch
+
 export -f service::install
 export -f service::remove
 export -f service::update
