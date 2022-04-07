@@ -2,7 +2,7 @@
 
 help() {
   echo "Usage:"
-  echo "  zservice install <service>"
+  echo "  zservice install <service>[@<version>] [alias]"
   echo ""
 }
 
@@ -12,18 +12,27 @@ core() {
     exit 0
   fi
   
+  # @1 install redis v1.2.3 redis_alias
   local name=$1
+  local version=$2
+  local alias_=$3
+
   if [ -z "$name" ]; then
     log::error "service name is requried"
     exit 1
   fi
 
-  # @TODO
-  local version=$2
-  local alias_=$3
+  # @2 install redis -v v1.2.3 redis_alias
   if [ "$2" = "-v" ]; then
     version=$3
     alias_=$4
+  fi
+
+  # @3 install redis@v1.2.3 redis_alias
+  if [ "$(version::at $name)" = "true" ]; then
+    version=$(version::at_version $name)
+    name=$(version::at_name $name)
+    alias_=$2
   fi
 
   service::install $name $version $alias_
