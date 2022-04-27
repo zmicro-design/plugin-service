@@ -162,6 +162,15 @@ service::run_check() {
     exit 0
   fi
 
+  # @PERMISSION should add permission for check file on config file, which will update service config
+  local config_file=$(service::get_configs_path $name)
+  if [ ! -f "$config_file" ]; then
+    sudo touch $config_file
+  fi
+  if [ ! -r "$config_file" ] || [ ! -w "$config_file" ]; then
+    sudo chown -R $USER $config_file
+  fi
+
   # custom check
   # $service_check_path
   # @TODO use . cannot load env
