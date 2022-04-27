@@ -570,6 +570,21 @@ service::version_echo() {
   version::service $name
 }
 
+service::is_running() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][service][is_running] service name is required"
+    exit 1
+  fi
+
+  local count=$(service::run $name ps -q | wc -l)
+  if [ "$count" -gt "1" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 export -f service::get_dirs
 export -f service::get_path
 
@@ -610,3 +625,5 @@ export -f service::run_check_ok
 export -f service::apply
 
 export -f service::version_echo
+
+export -f service::is_running

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+help() {
+  echo "Usage:"
+  echo "  zservice is_running <name> [options...]"
+}
+
+core() {
+  if [ "$1" = "" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+
+  local name=$1
+  service::is_running $name
+}
+
+run() {
+  core $@
+}
+
+run $@
