@@ -6,6 +6,11 @@ const parseArgs = require('yargs-parser');
 
 const DEFAULT_SERVICE_CONFIG = path.join(process.cwd(), 'zmicro-service.yml');
 
+// fix: unbound variable in bash
+//  solution: define the env variable
+//  stackoverflow: https://unix.stackexchange.com/questions/463034/bash-throws-error-line-8-1-unbound-variable
+$.env.NO_LOG = process.env.NO_LOG || 'true';
+
 async function apply(configFile = DEFAULT_SERVICE_CONFIG, options) {
   const cwd = process.cwd();
   const config = await fs.yml.load(configFile);
