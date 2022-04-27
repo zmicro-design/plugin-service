@@ -578,7 +578,13 @@ service::is_running() {
   fi
 
   local count=$(service::run $name ps -q | wc -l)
-  if [ "$count" -gt "1" ]; then
+  if [ "$?" != "0" ]; then
+    log::error "[$(timestamp)][service][is_running] service($name) error: ${count}"
+    echo "false"
+    return
+  fi
+
+  if [ "$count" -gt "0" ]; then
     echo "true"
   else
     echo "false"
