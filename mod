@@ -4,5 +4,5 @@ PLUGIN_DESCRIPTION="Service Manager"
 
 DEPENDENCIES=(
   "^docker@latest" # ^ => package
-  "^docker-compose@latest"
+  "^docker-compose@v1"
 )
