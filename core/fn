@@ -367,6 +367,8 @@ service::clone() {
   local version=$2
   local alias_=$3
 
+  local error_log=$(os::tmp_file)
+
   if [ -z "$name" ]; then
     log::error "[$(timestamp)][service::clone] name is required"
     exit 1
@@ -389,9 +391,10 @@ service::clone() {
       exit 1
     fi
 
-    git clone $service_repo_url -b $version $service_path >>$ZMICRO_LOG_COMMON_PATH # 2>>$ZMICRO_LOG_ERROR_PATH
+    git clone $service_repo_url -b $version $service_path >>$ZMICRO_LOG_COMMON_PATH 2>$error_log
     if [ "$?" != "0" ]; then
       log::error "[$(timestamp)][service::clone] error $name($version) ..."
+      cat $error_log
       exit 1
     fi
   else
@@ -399,26 +402,34 @@ service::clone() {
     local current_tag=$(git describe --tags)
     if [ "$current_tag" != "$version" ] && [ "$version" != "master" ]; then
       # git fetch origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
-      git fetch origin >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+      git fetch origin >> $ZMICRO_LOG_UPDATE_PATH 2>$error_log
       if [ "$?" != "0" ]; then
         echo "[$(timestamp)][service::clone] git fetch error ${name} ..."
-        tail -n 50 $ZMICRO_LOG_ERROR_PATH
+        cat $error_log
         exit -1
       fi
 
       local tag=$version
-      git checkout -b $version $tag >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+      # 1. if tag branch exist, remove it
+      git branch | grep $tag >> /dev/null 2>&1
+      if [ "$?" = "0" ]; then
+        git branch -D $tag >> /dev/null 2>&1
+      fi
+
+      # 2. checkout tag branch
+      git checkout -b $version $tag >> $ZMICRO_LOG_UPDATE_PATH 2>$error_log
       if [ "$?" != "0" ]; then
-        echo "[$(timestamp)][service::clone] git checkout error ${name} ..."
-        tail -n 50 $ZMICRO_LOG_ERROR_PATH
+        echo "[$(timestamp)][service::clone] git checkout error ${name} - ${tag} ..."
+        cat $error_log
         exit -1
       fi
     fi
 
-    git pull origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
+    # 3. update tag branch
+    git pull origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>$error_log
     if [ "$?" != "0" ]; then
       echo "[$(timestamp)][service::clone] git pull error ${name} ..."
-      tail -n 50 $ZMICRO_LOG_ERROR_PATH
+      cat $error_log
       exit -1
     fi
   fi
