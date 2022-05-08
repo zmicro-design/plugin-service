@@ -42,6 +42,11 @@ core() {
 
     # Found only one service
     if [ $count -eq 1 ]; then
+      if [ "$(service::is_running $service_name)" = "false" ]; then
+        log::error "service (${service_name}) is not running"
+        exit 1
+      fi
+      
       service::run $service_name exec $services $command
       exit 0
     fi
@@ -51,6 +56,11 @@ core() {
     log::debug "[service][exec] select service: $select_service"
 
     sub_service_name=$select_service
+  fi
+
+  if [ "$(service::is_running $service_name)" = "false" ]; then
+    log::error "service (${service_name}) is not running"
+    exit 1
   fi
 
   service::run $service_name exec $sub_service_name $command
