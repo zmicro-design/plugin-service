@@ -113,6 +113,13 @@ service::list_sub_services() {
 }
 
 service::run() {
+  # @TODO
+  which docker-compose >> /dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    zmicro package install docker@latest
+    zmicro package install docker-compose@v1
+  fi
+
   local name=$1
   local commands=${@:2}
   local service_path=$(service::get_path $name)
