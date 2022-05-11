@@ -44,8 +44,6 @@ core() {
     fi
   fi
 
-
-
   local service_path=$(service::get_path $name)
   if [ ! -d "$service_path" ]; then
     log::error "[$(timestamp)][service::release] service(${name}) not found"
