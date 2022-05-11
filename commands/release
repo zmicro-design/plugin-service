@@ -21,10 +21,30 @@ core() {
   fi
 
   local name=$1
+
   if [ -z "$name" ]; then
     log::error "[$(timestamp)][service::release] name is required"
     exit 1
   fi
+
+  if [ "$name" = "." ]; then
+    local path=$(dirname $PWD)
+    if [ "$path" = "$ZMICRO_PLUGINS_PATH/service/services" ]; then
+      local prename=$(basename $PWD)
+      os::inquirer value confirm "是否发布当前 service <$prename> ？"
+      if [ "$value" = "true" ]; then
+        name=$prename
+      else
+        log::info "取消发布"
+        exit 0
+      fi
+    else
+      log::error "[$(timestamp)][service::release] custom dir is not a service"
+      exit 1
+    fi
+  fi
+
+
 
   local service_path=$(service::get_path $name)
   if [ ! -d "$service_path" ]; then
