@@ -366,7 +366,7 @@ service::switch() {
     exit 1
   fi
 
-  if [ "$version" = "lastest" ]; then
+  if [ "$version" = "latest" ]; then
     version=master
   fi
 
