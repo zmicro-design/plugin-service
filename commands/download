@@ -1,8 +1,10 @@
 #!/bin/bash
 
 help() {
+  echo "Download Service Repo, alias of pull_repo"
+  echo ""
   echo "Usage:"
-  echo "  zservice pull_repo <service_name> [options...]"
+  echo "  zservice download <service_name> [options...]"
 }
 
 core() {
@@ -21,7 +23,7 @@ core() {
 
   service::clone $name $args
 
-  log::info "Successfully to pull service repo (${name})"
+  log::info "Successfully to download service (${name})"
 }
 
 run() {
