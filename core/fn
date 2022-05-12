@@ -452,7 +452,11 @@ service::install() {
   fi
 
   if [ -z "$version" ]; then
-    version=master
+    version="master"
+  fi
+
+  if [ "$version" = "latest" ]; then
+    version="master"
   fi
 
   if [ -z "$alias_" ]; then
