@@ -366,6 +366,10 @@ service::switch() {
     exit 1
   fi
 
+  if [ "$version" = "lastest" ]; then
+    version=master
+  fi
+
   service::clone $name $version
 }
 

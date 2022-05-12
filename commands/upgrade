@@ -20,9 +20,13 @@ core() {
   local name=$1
   local version=$2
 
-  if [ -z "$name" ] || [ -z "$version" ]; then
-    log::error "name and version are required"
+  if [ -z "$name" ]; then
+    log::error "name are required"
     exit 1
+  fi
+
+  if [ -z "$version" ]; then
+    version=latest
   fi
 
   # 1. [stop] stop the origin service
