@@ -109,7 +109,7 @@ service::list_sub_services() {
   service::load_config $name
 
   cd $service_path
-  docker-compose -f docker-compose.yml ps --services
+  $DOCKER_COMPOSE -f docker-compose.yml ps --services
 }
 
 service::run() {
@@ -154,7 +154,7 @@ service::run() {
 
   cd $service_path
   log::debug "[$(timestamp)][service] docker-compose -f docker-compose.yml $commands"
-  docker-compose -f docker-compose.yml $commands
+  $DOCKER_COMPOSE -f docker-compose.yml $commands
 }
 
 service::run_check() {
