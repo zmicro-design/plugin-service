@@ -120,6 +120,17 @@ service::run() {
     zmicro package install docker-compose@v1
   fi
 
+  which docker >> /dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    log::error "[service::run] unexpect error: docker cli not found"
+    exit 1
+  fi
+
+  docker network inspect ${PLUGIN_SERVICE_DOCKER_NETWORK} >> /dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    docker network create ${PLUGIN_SERVICE_DOCKER_NETWORK} >> /dev/null
+  fi
+
   local name=$1
   local commands=${@:2}
   local service_path=$(service::get_path $name)
