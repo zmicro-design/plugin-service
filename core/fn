@@ -7,7 +7,7 @@ service::get_dirs() {
 service::get_path() {
   local name=$1
   if [ -z "$name" ]; then
-    log::error "[service::get_config_path] name is required"
+    log::error "[service::get_path] name is required"
     exit 1
   fi
 

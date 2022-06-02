@@ -10,6 +10,16 @@ core() {
     help
     exit 0
   fi
+
+  # @TODO
+  local service=$1
+  local module=$2
+  if [ "$module" = "config" ]; then
+    local service_config_path=$PLUGIN_SERVICE_CONFIGS/$service
+    cd $service_config_path
+    exec $SHELL
+    exit 0
+  fi
   
   zservice cd $@
 }
