@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  local_dev:
+    container_name: ${PLUGIN_SERVICE_LOCAL_NAME}
+    build:
+      context: ${PLUGIN_SERVICE_LOCAL_CONTEXT}
+      dockerfile: Dockerfile
+    ports:
+      - 0.0.0.0:8080:8080
+    env_file:
+      - $PLUGIN_SERVICE_LOCAL_ENV_FILE
+
+networks:
+  default:
+    external: true
+    name: compose-ingress

@@ -1,0 +1,55 @@
+#!/bin/bash
+
+help() {
+  echo "Test local service"
+  echo ""
+  echo "Usage:"
+  echo "  zservice local dev"
+}
+
+core() {
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+
+  local context=$PWD
+  local dockerfile_path=$context/Dockerfile
+  local dotenv_path=$context/.env
+  local zmicro_rc=$context/.zmicro
+  if [ ! -f "$dockerfile_path" ]; then
+    log::error "Dockerfile not found"
+    exit 1
+  fi
+
+  if [ ! -f "$dotenv_path" ]; then
+    log::error ".env not found"
+    exit 1
+  fi
+
+  if [ ! -f "$zmicro_rc" ]; then
+    log::error ".zmicro not found"
+    exit 1
+  fi
+
+  config::load_file $zmicro_rc
+
+  export PLUGIN_SERVICE_LOCAL_CONTEXT=$context
+  export PLUGIN_SERVICE_LOCAL_ENV_FILE=$dotenv_path
+  export PLUGIN_SERVICE_LOCAL_NAME=$SERVICE_LOCAL_NAME
+
+  cd $ZMICRO_PLUGINS_PATH/service/config/local
+
+  if [ "$DEBUG" = "true" ]; then
+    $DOCKER_COMPOSE config
+    exit 0
+  fi
+
+  $DOCKER_COMPOSE up --build
+}
+
+run() {
+  core $@
+}
+
+run $@
