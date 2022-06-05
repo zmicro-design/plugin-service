@@ -19,6 +19,11 @@ core() {
     cd $service_config_path
     exec $SHELL
     exit 0
+  elif [ "$module" = "data" ]; then
+    local service_data_path=$PLUGIN_SERVICE_DATA/$service
+    cd $service_data_path
+    exec $SHELL
+    exit 0
   fi
   
   zservice cd $@
