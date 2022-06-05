@@ -10,6 +10,8 @@ services:
       - 0.0.0.0:8080:8080
     env_file:
       - $PLUGIN_SERVICE_LOCAL_ENV_FILE
+    volumes:
+      - ${PLUGIN_SERVICE_DATA}/local/${PLUGIN_SERVICE_LOCAL_NAME}:/data
 
 networks:
   default:

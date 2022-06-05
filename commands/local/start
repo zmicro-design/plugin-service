@@ -1,10 +1,10 @@
 #!/bin/bash
 
 help() {
-  echo "Test local service"
+  echo "Start local service"
   echo ""
   echo "Usage:"
-  echo "  zservice local dev"
+  echo "  zservice local start"
 }
 
 core() {
@@ -33,10 +33,6 @@ core() {
   fi
 
   config::load_file $zmicro_rc
-  if [ -z "$SERVICE_LOCAL_NAME" ]; then
-    log::error "SERVICE_LOCAL_NAME not in .zmicro"
-    exit 1
-  fi
 
   export PLUGIN_SERVICE_LOCAL_CONTEXT=$context
   export PLUGIN_SERVICE_LOCAL_ENV_FILE=$dotenv_path
@@ -49,7 +45,7 @@ core() {
     exit 0
   fi
 
-  $DOCKER_COMPOSE up --build
+  $DOCKER_COMPOSE up --build -d
 }
 
 run() {
