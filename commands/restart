@@ -3,6 +3,12 @@
 help() {
   echo "Usage:"
   echo "  zservice restart <service_name> [options...]"
+  echo ""
+  echo "Options:"
+  echo "  -h, --help              Get help"
+  echo "  -p, --pull              Upgrade the image"
+  echo "  -u, --upgrade           Upgrade the image"
+  echo ""
 }
 
 core() {
@@ -14,23 +20,54 @@ core() {
   # Exit when met error
   set -e
 
-  local service_name=$1
-  local args=${@:2}
+  local service_name=
+  local pull=false
+
+  local args_length=${#@}
+  local args_index=0
+  while [ "$1" != "" ]; do
+    args_index=$((args_index + 1))
+    case $1 in
+      -h | --help)
+        help
+        exit 0
+        ;;
+      -p | --pull)
+        pull=true
+        ;;
+      -u | --upgrade)
+        pull=true
+        ;;
+      *)
+        if [ "$args_index" != "$args_length" ]; then
+          log::error "Unknown option: $1"
+          exit 1
+        else
+          service_name=$1
+        fi
+        ;;
+    esac
+    shift
+  done
+
   # service::run $service_name restart $args
 
   # zmicro service stop $service_name
   # zmicro service start $service_name
 
-  # 滚动更新
-  # pull latest, make it as rolling update
-  service::run $service_name pull
+  if [ "$pull" = "true" ]; then
+    # 滚动更新
+    # pull latest, make it as rolling update
+    service::run $service_name pull
+  fi
+
   # 检查是否需要 Build，有 image 目录
   service::build $service_name
 
   # stop
   service::run $service_name down
   # then start
-  service::run $service_name up -d $args
+  service::run $service_name up -d
 }
 
 run() {
