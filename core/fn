@@ -189,6 +189,11 @@ service::run_check() {
     sudo chown -R $USER $config_file
   fi
 
+  if [ "$DEBUG" = "true" ]; then
+    log::info "[DEBUG][service][$name]: $SERVICE_CONFIG"
+    cat $SERVICE_CONFIG
+  fi
+
   # custom check
   # $service_check_path
   # @TODO use . cannot load env
