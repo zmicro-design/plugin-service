@@ -637,6 +637,16 @@ service::is_running() {
   fi
 }
 
+service::config() {
+  config::set_filepath $SERVICE_CONFIG
+  config::set_ignore_if_exists $SERVICE_CONFIG
+
+  config::inquirer "$@"
+
+  config::unset_filepath
+  config::unset_ignore_if_exists
+}
+
 export -f service::get_dirs
 export -f service::get_path
 
@@ -679,3 +689,5 @@ export -f service::apply
 export -f service::version_echo
 
 export -f service::is_running
+
+export -f service::config 
