@@ -23,6 +23,16 @@ core() {
   local service_name=
   local pull=false
 
+  # set_pull_flag() {
+  #   pull=true
+  # }
+
+  # local options=(
+  #   "-h,--help              Get help            help"
+  #   "-p,--pull              Upgrade the image   set_pull_flag"
+  #   "-u,--upgrade           Upgrade the image   set_pull_flag"
+  # )
+
   local args_length=${#@}
   local args_index=0
   while [ "$1" != "" ]; do
