@@ -16,3 +16,8 @@ export PLUGIN_SERVICE_DOCKER_NETWORK=${PLUGIN_SERVICE_DOCKER_NETWORK:-"compose-i
 
 # @TODO
 export DOCKER_COMPOSE=${DOCKER_COMPOSE:-$(which docker-compose)}
+
+# @FIX if first time compose not found, which will install it
+if [ -z "$DOCKER_COMPOSE" ]; then
+  DOCKER_COMPOSE="/usr/local/bin/docker-compose"
+fi
