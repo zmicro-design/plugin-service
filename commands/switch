@@ -29,7 +29,7 @@ core() {
   service::switch $name $version
 
   # 2. restart the service
-  zmicro service restart $name
+  zmicro service restart --pull $name
 }
 
 run() {
