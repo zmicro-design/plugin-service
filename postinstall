@@ -5,12 +5,12 @@ cd $ZMICRO_PLUGINS_PATH/service/core/js
 which yarn >> /dev/null 2>&1
 if [ "$?" != "0" ]; then
   which npm >> /dev/null 2>&1
-  if [ "$?" != "0" ]; then 
+  if [ "$?" = "0" ]; then 
     npm i -g yarn
   fi
 fi
 
 which yarn >> /dev/null 2>&1
-if [ "$?" != "0" ]; then
+if [ "$?" = "0" ]; then
   yarn
 fi
