@@ -104,7 +104,7 @@ service::list_sub_services() {
     log::error "[$(timestamp)][service] service($name) not found"
     exit 1
   fi
-  
+
   # @TODO
   service::load_config $name
 
@@ -114,21 +114,21 @@ service::list_sub_services() {
 
 service::run() {
   # @TODO
-  which docker-compose >> /dev/null 2>&1
+  which docker-compose >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     zmicro package install docker@latest
     zmicro package install docker-compose@v1
   fi
 
-  which docker >> /dev/null 2>&1
+  which docker >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     log::error "[service::run] unexpect error: docker cli not found"
     exit 1
   fi
 
-  docker network inspect ${PLUGIN_SERVICE_DOCKER_NETWORK} >> /dev/null 2>&1
+  docker network inspect ${PLUGIN_SERVICE_DOCKER_NETWORK} >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
-    docker network create ${PLUGIN_SERVICE_DOCKER_NETWORK} >> /dev/null
+    docker network create ${PLUGIN_SERVICE_DOCKER_NETWORK} >>/dev/null
   fi
 
   local name=$1
@@ -235,7 +235,7 @@ service::get_data_path() {
       sudo chown $USER $path
     else
       mkdir -p $path
-    fi 
+    fi
   fi
 
   echo $path
@@ -255,7 +255,7 @@ service::get_logs_path() {
       sudo chown $USER $path
     else
       mkdir -p $path
-    fi 
+    fi
   fi
 
   echo $path
@@ -275,7 +275,7 @@ service::get_configs_path() {
       sudo chown $USER $path
     else
       mkdir -p $path
-    fi 
+    fi
   fi
 
   echo $path
@@ -393,6 +393,13 @@ service::clone() {
   local name=$1
   local version=$2
   local alias_=$3
+  local service_repo_url=""
+
+  # @TODO CHECK IS HTTP URL
+  if [ "${version:0:4}" = "http" ]; then
+    service_repo_url=$version
+    version=""
+  fi
 
   local error_log=$(os::tmp_file)
 
@@ -410,7 +417,10 @@ service::clone() {
   fi
 
   local service_path=$(service::get_path $alias_)
-  local service_repo_url=$(service::get_repo_url $name)
+  if [ -z "$service_repo_url" ]; then
+    service_repo_url=$(service::get_repo_url $name)
+  fi
+
   if [ ! -d "$service_path" ]; then
     curl -I $service_repo_url 2>>/dev/null | head -n 1 | grep 404 >>/dev/null 2>&1
     if [ "$?" = "0" ]; then
@@ -429,7 +439,7 @@ service::clone() {
     local current_tag=$(git describe --tags)
     if [ "$current_tag" != "$version" ] && [ "$version" != "master" ]; then
       # git fetch origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
-      git fetch origin >> $ZMICRO_LOG_UPDATE_PATH 2>$error_log
+      git fetch origin >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
       if [ "$?" != "0" ]; then
         echo "[$(timestamp)][service::clone] git fetch error ${name} ..."
         cat $error_log
@@ -438,13 +448,13 @@ service::clone() {
 
       local tag=$version
       # 1. if tag branch exist, remove it
-      git branch | grep $tag >> /dev/null 2>&1
+      git branch | grep $tag >>/dev/null 2>&1
       if [ "$?" = "0" ]; then
-        git branch -D $tag >> /dev/null 2>&1
+        git branch -D $tag >>/dev/null 2>&1
       fi
 
       # 2. checkout tag branch
-      git checkout -b $version $tag >> $ZMICRO_LOG_UPDATE_PATH 2>$error_log
+      git checkout -b $version $tag >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
       if [ "$?" != "0" ]; then
         echo "[$(timestamp)][service::clone] git checkout error ${name} - ${tag} ..."
         cat $error_log
@@ -453,7 +463,7 @@ service::clone() {
     fi
 
     # 3. update tag branch
-    git pull origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>$error_log
+    git pull origin $version >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
     if [ "$?" != "0" ]; then
       echo "[$(timestamp)][service::clone] git pull error ${name} ..."
       cat $error_log
@@ -567,7 +577,7 @@ service::description() {
 
 service::get_image_path() {
   local name=$1
-   if [ -z "$name" ]; then
+  if [ -z "$name" ]; then
     log::error "[$(timestamp)][service::image] name is required"
     exit 1
   fi
@@ -578,7 +588,7 @@ service::get_image_path() {
 
 service::has_images() {
   local name=$1
-   if [ -z "$name" ]; then
+  if [ -z "$name" ]; then
     log::error "[$(timestamp)][service::image] name is required"
     exit 1
   fi
@@ -695,4 +705,4 @@ export -f service::version_echo
 
 export -f service::is_running
 
-export -f service::config 
+export -f service::config

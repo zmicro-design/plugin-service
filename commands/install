@@ -4,6 +4,11 @@ help() {
   echo "Usage:"
   echo "  zservice install <service>[@<version>] [alias]"
   echo ""
+  echo "Examples:"
+  echo "  zmicro service install redis"
+  echo "  zmicro service install redis@latest"
+  echo "  zmicro service install redis@v1.0.0"
+  echo "  zmicro service install redis https://private.example.com/namespace/redis"
 }
 
 core() {
@@ -11,7 +16,7 @@ core() {
     help
     exit 0
   fi
-  
+
   # @1 install redis v1.2.3 redis_alias
   local name=$1
   local version=$2

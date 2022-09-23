@@ -25,7 +25,7 @@ core() {
 }
 
 run() {
-  core $@
+  core "$@"
 }
 
-run $@
+run "$@"
