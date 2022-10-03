@@ -1,0 +1,28 @@
+#!/bin/bash
+
+service::backup() {
+  local name=zmicro_backup_${PLUGIN_NAME}
+
+  if [ "$(zmicro cron has $name)" = "true" ]; then
+    zmicro cron status "$name" "0 9 _/1 _ _ " >>/dev/null 2>&1
+    if [ "$?" != "0" ]; then
+      zmicro cron enable $name
+
+      log::success "[service::backup] auto backup enabled"
+      exit 0
+    fi
+
+    log::success "[service::backup] auto backup is running"
+    return
+  fi
+
+  zmicro cron create $name 0 4 1 _/1 _ zmicro backup create $PLUGIN_NAME $PLUGIN_DATA >>/dev/null
+  if [ "$?" != "0" ]; then
+    log::error "[service::backup] failed to create auto backup"
+    exit 1
+  else
+    log::success "[service::backup] auto backup ok at 04:00 AM this first day of every month"
+  fi
+}
+
+export -f service::backup
