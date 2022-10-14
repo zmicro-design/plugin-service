@@ -416,6 +416,9 @@ service::clone() {
     alias_=$name
   fi
 
+  # using smart proxy
+  net::using_smart_proxy 2>&1
+
   local service_path=$(service::get_path $alias_)
   if [ -z "$service_repo_url" ]; then
     service_repo_url=$(service::get_repo_url $name)
