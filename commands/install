@@ -40,6 +40,7 @@ core() {
     alias_=$2
   fi
 
+  export SERVICE_AUTO_START=true
   service::install $name $version $alias_
 }
 

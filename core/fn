@@ -150,6 +150,9 @@ service::run() {
     # exit 1
     log::info "[$(timestamp)][service] try to install service($name) ..."
     service::install $name
+
+    # rerun
+    service::run "$@"
     return
   fi
 
@@ -500,7 +503,7 @@ service::install() {
   service::clone $name $version $alias_
 
   # start service
-  if [ "$SERVICE_AUTO_START" != "N" ]; then
+  if [ "$SERVICE_AUTO_START" = "true" ]; then
     service::run $name up -d
   fi
 }
