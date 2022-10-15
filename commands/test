@@ -39,6 +39,8 @@ core() {
 
   service::run $service_name up -d
 
+  service::run $service_name logs
+
   service::run $service_name down
 }
 
