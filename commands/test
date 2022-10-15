@@ -33,7 +33,7 @@ core() {
     exit 0
   fi
 
-  export DOCKER_COMPOSE_FILE_NAME=$DOCKER_COMPOSE_TEST_FILE_NAME
+  export TESTING=true
 
   service::run $service_name config $args
 

@@ -18,7 +18,7 @@ export PLUGIN_SERVICE_DOCKER_NETWORK=${PLUGIN_SERVICE_DOCKER_NETWORK:-"compose-i
 export DOCKER_COMPOSE=${DOCKER_COMPOSE}
 #
 export DOCKER_COMPOSE_FILE_NAME=${DOCKER_COMPOSE_FILE_NAME:-"docker-compose.yml"}
-export DOCKER_COMPOSE_TEST_FILE_NAME=${DOCKER_COMPOSE_TEST_FILE_NAME:-"docker-compose.test.yml"}
+export DOCKER_COMPOSE_TEST_FILE_NAME=${DOCKER_COMPOSE_TEST_FILE_NAME:-"docker-compose.yml"}
 
 # fix centos 7 which show many warnings
 if [ -z "$DOCKER_COMPOSE" ]; then

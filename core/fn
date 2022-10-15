@@ -168,6 +168,15 @@ service::run() {
 
   cd $service_path
   log::debug "[$(timestamp)][service] docker-compose -f ${DOCKER_COMPOSE_FILE_NAME} $commands"
+
+  # TESTING MODE
+  if [ "$TESTING" = "true" ]; then
+    # test dir
+    cd $service_path/test
+    #
+    export DOCKER_COMPOSE_FILE_NAME=$DOCKER_COMPOSE_TEST_FILE_NAME
+  fi
+
   $DOCKER_COMPOSE -f ${DOCKER_COMPOSE_FILE_NAME} $commands
 }
 
