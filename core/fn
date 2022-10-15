@@ -319,7 +319,7 @@ service::load_config() {
   # @TODO
   export SERVICE_DIR=$(service::get_path $name)
   if [ ! -d "$SERVICE_DIR" ]; then
-    log::error "[$(timestamp)][service::load_config] service is not invalid"
+    log::error "[$(timestamp)][service::load_config] service($name) is not invalid"
     exit 1
   fi
 
@@ -327,6 +327,11 @@ service::load_config() {
   export SERVICE_LOGS=$(service::get_logs_path $name)
   export SERVICE_CONFIGS=$(service::get_configs_path $name)
   export SERVICE_CONFIG=$SERVICE_CONFIGS/config
+
+  # TESTING MODE
+  if [ "$TESTING" = "true" ]; then
+    SERVICE_CONFIG=$SERVICE_DIR/test/.env
+  fi
 
   if [ -z "$SERVICE_DATA" ]; then
     log::error "[service::run] SERVICE_DATA is empty"
