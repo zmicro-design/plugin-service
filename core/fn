@@ -448,7 +448,7 @@ service::clone() {
       exit 1
     fi
 
-    git clone $service_repo_url -b $version $service_path >>$ZMICRO_LOG_COMMON_PATH 2>$error_log
+    os::git clone $service_repo_url -b $version $service_path >>$ZMICRO_LOG_COMMON_PATH 2>$error_log
     if [ "$?" != "0" ]; then
       log::error "[$(timestamp)][service::clone] error $name($version) ..."
       cat $error_log
@@ -459,7 +459,7 @@ service::clone() {
     local current_tag=$(git describe --tags)
     if [ "$current_tag" != "$version" ] && [ "$version" != "master" ]; then
       # git fetch origin $version >> $ZMICRO_LOG_UPDATE_PATH 2>>$ZMICRO_LOG_ERROR_PATH
-      git fetch origin >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
+      os::git fetch origin >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
       if [ "$?" != "0" ]; then
         echo "[$(timestamp)][service::clone] git fetch error ${name} ..."
         cat $error_log
@@ -483,7 +483,7 @@ service::clone() {
     fi
 
     # 3. update tag branch
-    git pull origin $version >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
+    os::git pull origin $version >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
     if [ "$?" != "0" ]; then
       echo "[$(timestamp)][service::clone] git pull error ${name} ..."
       cat $error_log
