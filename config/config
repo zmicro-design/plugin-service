@@ -32,3 +32,7 @@ fi
 if [ -z "$DOCKER_COMPOSE" ]; then
   DOCKER_COMPOSE="/usr/local/bin/docker-compose"
 fi
+
+if [ ! -w "$PLUGIN_DIR/services" ]; then
+  sudo chmod a+rw $PLUGIN_DIR/services
+fi
