@@ -36,7 +36,7 @@ core() {
   service::run $name pull
 
   # 3. [switch] restart
-  service::run $service_name up -d
+  service::run $name up -d
 }
 
 run() {
