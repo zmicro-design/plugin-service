@@ -1,0 +1,46 @@
+#!/bin/bash
+
+help() {
+  echo "Usage:"
+  echo "  zservice upgrade <service_name> <version> [options...]"
+  # echo ""
+  # echo "    -h, --help              Get help"
+  # echo "    -u, --update <version>  Set new version"
+  echo ""
+  echo "Example:"
+  echo "  zservice upgrade ingress v1.0.0"
+}
+
+core() {
+  if [ "$1" = "" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+
+  local name=$1
+  local version=$2
+
+  if [ -z "$name" ]; then
+    log::error "name are required"
+    exit 1
+  fi
+
+  if [ -z "$version" ]; then
+    version=latest
+  fi
+
+  # 1. switch to the specified version
+  service::switch $name $version
+
+  # 2. pull images
+  service::run $name pull
+
+  # 3. [switch] restart
+  service::run $service_name up -d
+}
+
+run() {
+  core $@
+}
+
+run $@
