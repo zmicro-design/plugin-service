@@ -2,13 +2,17 @@
 
 help() {
   echo "Usage:"
-  echo "  zservice upgrade <service_name> <version> [options...]"
+  echo "  zservice upgrade [options...] <service_name> <version>"
   # echo ""
   # echo "    -h, --help              Get help"
   # echo "    -u, --update <version>  Set new version"
   echo ""
+  echo "Options:"
+  echo "  --rolling    Rolling mode will not stop service before upgrade"
+  echo ""
   echo "Example:"
   echo "  zservice upgrade ingress v1.0.0"
+  echo ""
 }
 
 core() {
@@ -17,8 +21,36 @@ core() {
     exit 0
   fi
 
-  local name=$1
-  local version=$2
+  local name=""
+  local version=""
+
+  while [[ $# -gt 0 ]]; do
+    local key=$1
+    local value=$2
+    case $key in
+    -r | --rolling)
+      os::set_var is_rolling_upgrade true
+      shift
+      ;;
+    *)
+      if [ "$(string::match $key ^-)" = "true" ]; then
+        log::error "[$(timestamp)] ERROR: unknown parameter \"$key\""
+        exit 1
+      fi
+
+      if [ -z "$name" ]; then
+        name=$key
+        shift
+      elif [ -z "$version" ]; then
+        version=$key
+        shift
+      else
+        log::error "[$(timestamp)] unknown parameter \"$key\""
+        exit 1
+      fi
+      ;;
+    esac
+  done
 
   if [ -z "$name" ]; then
     log::error "name are required"
@@ -29,12 +61,14 @@ core() {
     version=latest
   fi
 
-  # 1. [stop] stop the origin service
-  #   why should we stop the origin service?
-  #     - because service code (${DOCKER_COMPOSE_FILE_NAME}) may be changed
-  #     - maybe services are not the names, so we need to stop all services first
-  #     - it doesnot like update date service image only
-  zmicro service stop $name
+  if [ "$is_rolling_upgrade" != "true" ]; then
+    # 1. [stop] stop the origin service
+    #   why should we stop the origin service?
+    #     - because service code (${DOCKER_COMPOSE_FILE_NAME}) may be changed
+    #     - maybe services are not the names, so we need to stop all services first
+    #     - it doesnot like update date service image only
+    zmicro service stop $name
+  fi
 
   # 1. [switch] switch the specified version
   zmicro service switch $name $version
