@@ -13,7 +13,7 @@ core() {
 
   local service_name=$1
   local args=${@:2}
-  service::run $service_name down $args
+  service::run $service_name down $args --remove-orphans
 }
 
 run() {

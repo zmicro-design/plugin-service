@@ -536,7 +536,7 @@ service::remove() {
   fi
 
   # stop service
-  service::run $name down
+  service::run $name down --remove-orphans
 
   # remove service dir
   rm -rf $service_path

@@ -18,7 +18,7 @@ core() {
   local args=${@:2}
 
   # stop
-  service::run $service_name down $args
+  service::run $service_name down $args --remove-orphans
   # then start
   service::run $service_name up -d $args
 }

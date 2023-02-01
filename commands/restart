@@ -75,7 +75,7 @@ core() {
   service::build $service_name
 
   # stop
-  service::run $service_name down
+  service::run $service_name down --remove-orphans
   # then start
   service::run $service_name up -d
 }
