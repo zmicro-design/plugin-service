@@ -2,11 +2,11 @@
 
 help() {
   echo "Usage:"
-  echo "  zservice go <service_name>"
+  echo "  service go <service_name>"
 }
 
 core() {
-  if [ "$1" = "" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     help
     exit 0
   fi
@@ -14,6 +14,13 @@ core() {
   # @TODO
   local service=$1
   local module=$2
+
+  if [ "$service" = "" ]; then
+    cd $ZMICRO_PLUGINS_PATH/$PLUGIN_SERVICE_NAME
+    exec $SHELL
+    return 0
+  fi
+
   if [ "$module" = "config" ]; then
     local service_config_path=$PLUGIN_SERVICE_CONFIGS/$service
     cd $service_config_path
@@ -25,7 +32,7 @@ core() {
     exec $SHELL
     exit 0
   fi
-  
+
   zservice cd $@
 }
 
