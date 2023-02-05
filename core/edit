@@ -1,0 +1,19 @@
+#!/bin/bash
+
+service::edit_config() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)] service name is required"
+    return 1
+  fi
+
+  local config_path=$PLUGIN_SERVICE_CONFIGS/$name/config
+  if [ ! -f "$config_path" ]; then
+    log::error "[$(timestamp)] service ($name) config not found at: $config_path"
+    return 1
+  fi
+
+  sudo vim $config_path
+}
+
+export -f service::edit_config

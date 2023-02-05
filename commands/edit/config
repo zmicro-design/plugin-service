@@ -1,0 +1,51 @@
+#!/bin/bash
+
+help() {
+  echo "Edit daemon service config"
+  echo ""
+  echo "Usage:"
+  echo "  service edit config [options] [app_name]"
+  echo ""
+}
+
+core() {
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+
+  local service=$1
+  local args=${@:2}
+
+  if [ -z "$service" ]; then
+    log::error "[$(timestamp)] service name is required"
+    return 1
+  fi
+
+  # if [ -z "$service" ]; then
+  #   local available_services=($(service::list))
+  #   os::inquirer service "select" available_services "Select an service ?" true
+  # else
+  #   match() {
+  #     string::match $1 ^$service
+  #   }
+
+  #   local available_services=($(array::filter match $(service::list)))
+  #   local available_count=$(array::length $available_services)
+  #   if [ $available_count -eq 0 ]; then
+  #     log::error "no services found"
+  #   elif [ $available_count -eq 1 ]; then
+  #     service=$(array::first_element $available_services)
+  #   else
+  #     os::inquirer service "select" available_services "Select an service ?" true
+  #   fi
+  # fi
+
+  service::edit_config $service $args
+}
+
+run() {
+  core $@
+}
+
+run $@
