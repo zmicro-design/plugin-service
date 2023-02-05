@@ -4,7 +4,7 @@ help() {
   echo "Edit daemon service config"
   echo ""
   echo "Usage:"
-  echo "  service edit config [options] [app_name]"
+  echo "  service edit config <name>"
   echo ""
 }
 
