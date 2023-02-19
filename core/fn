@@ -520,6 +520,20 @@ service::install() {
   if [ "$SERVICE_AUTO_START" = "true" ]; then
     service::run $name up -d
   fi
+
+  log::info "[$(timestamp)] succeed to install service ${alias_}."
+  cat <<EOF
+  
+# 更多用法
+# 1. 查看日志
+$ zmicro service logs ${alias_} -f
+# 2. 修改配置 
+$ zmicro service edit config ${alias_}
+# 3. 重启服务
+$ zmicro service restart ${alias_}
+# 4. 关闭服务
+$ zmicro service stop ${alias_}
+EOF
 }
 
 service::remove() {
