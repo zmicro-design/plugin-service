@@ -531,7 +531,9 @@ $ zmicro service logs ${alias_} -f
 $ zmicro service edit config ${alias_}
 # 3. 重启服务
 $ zmicro service restart ${alias_}
-# 4. 关闭服务
+# 4. 升级服务
+$ zmicro service upgrade ${alias_}
+# 5. 关闭服务
 $ zmicro service stop ${alias_}
 EOF
 }
