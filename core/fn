@@ -117,7 +117,13 @@ service::run() {
   which docker-compose >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     zmicro package install docker@latest
-    zmicro package install docker-compose@v1
+    zmicro package install docker-compose@latest
+  fi
+
+  # if not v2, install v2
+  docker-compose -v | grep v2 >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    zmicro package install docker-compose@latest
   fi
 
   which docker >>/dev/null 2>&1
