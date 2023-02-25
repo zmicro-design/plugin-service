@@ -536,7 +536,7 @@ service::install() {
   
 # 更多用法
 # 1. 查看日志
-$ zmicro service logs ${alias_} -f
+$ zmicro service logs ${alias_} -f --tail 100
 # 2. 修改配置 
 $ zmicro service edit config ${alias_}
 # 3. 重启服务
