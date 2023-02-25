@@ -488,6 +488,10 @@ service::clone() {
       fi
     fi
 
+    if [ ! -r ".git/FETCH_HEAD" ] || [ ! -w ".git/FETCH_HEAD" ]; then 
+      sudo chown -R $USER .git/FETCH_HEAD
+    fi
+
     # 3. update tag branch
     os::git pull origin $version >>$ZMICRO_LOG_UPDATE_PATH 2>$error_log
     if [ "$?" != "0" ]; then
