@@ -546,6 +546,7 @@ $ zmicro service upgrade ${alias_}
 # 5. 关闭服务
 $ zmicro service stop ${alias_}
 #####################################################
+
 EOF
 }
 
