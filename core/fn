@@ -533,7 +533,7 @@ service::install() {
 
   log::info "[$(timestamp)] succeed to install service ${alias_}."
   cat <<EOF
-  
+#####################################################  
 # 更多用法
 # 1. 查看日志
 $ zmicro service logs ${alias_} -f --tail 100
@@ -545,6 +545,7 @@ $ zmicro service restart ${alias_}
 $ zmicro service upgrade ${alias_}
 # 5. 关闭服务
 $ zmicro service stop ${alias_}
+#####################################################
 EOF
 }
 
