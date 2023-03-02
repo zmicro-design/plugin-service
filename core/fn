@@ -489,7 +489,7 @@ service::clone() {
     fi
 
     if [ ! -r ".git/FETCH_HEAD" ] || [ ! -w ".git/FETCH_HEAD" ]; then 
-      sudo chown -R $USER .git/FETCH_HEAD
+      sudo chown -R $USER .git
     fi
 
     # 3. update tag branch
