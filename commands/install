@@ -2,13 +2,19 @@
 
 help() {
   echo "Usage:"
-  echo "  zservice install <service>[@<version>] [alias]"
+  echo "  zmicro service install <service>[@<version>] [alias]"
+  echo ""
+  echo "Args:"
+  echo "  service - the service name, such as, redis, gzfly ..."
+  echo "  version - the service version"
+  echo "  alias   - the service new name, it is userful for multiple service instances"
   echo ""
   echo "Examples:"
   echo "  zmicro service install redis"
   echo "  zmicro service install redis@latest"
   echo "  zmicro service install redis@v1.0.0"
   echo "  zmicro service install redis https://private.example.com/namespace/redis"
+  echo "  zmicro service install redis@v1.0.0 redis_service_name"
 }
 
 core() {
