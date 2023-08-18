@@ -15,22 +15,22 @@ export PLUGIN_SERVICE_DOCKER_NETWORK=${PLUGIN_SERVICE_DOCKER_NETWORK:-"compose-i
 # echo "PLUGIN_SERVICE_CONFIGS: $PLUGIN_SERVICE_CONFIGS"
 
 # @TODO
-export DOCKER_COMPOSE=${DOCKER_COMPOSE}
+export PLUGIN_SERVICE_DOCKER_COMPOSE=${PLUGIN_SERVICE_DOCKER_COMPOSE}
 #
-export DOCKER_COMPOSE_FILE_NAME=${DOCKER_COMPOSE_FILE_NAME:-"docker-compose.yml"}
-export DOCKER_COMPOSE_TEST_FILE_NAME=${DOCKER_COMPOSE_TEST_FILE_NAME:-"docker-compose.yml"}
+export PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME=${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME:-"docker-compose.yml"}
+export PLUGIN_SERVICE_DOCKER_COMPOSE_TEST_FILE_NAME=${PLUGIN_SERVICE_DOCKER_COMPOSE_TEST_FILE_NAME:-$PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME}
 
 # fix centos 7 which show many warnings
-if [ -z "$DOCKER_COMPOSE" ]; then
+if [ -z "$PLUGIN_SERVICE_DOCKER_COMPOSE" ]; then
   which docker-compose >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
-    DOCKER_COMPOSE=$(which docker-compose)
+    export PLUGIN_SERVICE_DOCKER_COMPOSE=$(which docker-compose)
   fi
 fi
 
 # @FIX if first time compose not found, which will install it
-if [ -z "$DOCKER_COMPOSE" ]; then
-  DOCKER_COMPOSE="/usr/local/bin/docker-compose"
+if [ -z "$PLUGIN_SERVICE_DOCKER_COMPOSE" ]; then
+  export PLUGIN_SERVICE_DOCKER_COMPOSE="/usr/local/bin/docker-compose"
 fi
 
 if [ ! -w "$PLUGIN_DIR/services" ]; then

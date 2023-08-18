@@ -67,7 +67,7 @@ service::list() {
       local service_path=$service_dir/$service_name
 
       # Check is a real service
-      if [ -f $service_path/${DOCKER_COMPOSE_FILE_NAME} ]; then
+      if [ -f $service_path/${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME} ]; then
         service_count=$((service_count + 1))
       fi
     done
@@ -78,7 +78,7 @@ service::list() {
       local service_path=$service_dir/$service_name
 
       # Check is a real service
-      if [ -f $service_path/${DOCKER_COMPOSE_FILE_NAME} ]; then
+      if [ -f $service_path/${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME} ]; then
         index=$(number::step index)
         log "    $(color::success "$index $service_name")"
       fi
@@ -109,7 +109,7 @@ service::list_sub_services() {
   service::load_config $name
 
   cd $service_path
-  $DOCKER_COMPOSE -f ${DOCKER_COMPOSE_FILE_NAME} ps --services
+  $PLUGIN_SERVICE_DOCKER_COMPOSE -f ${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME} ps --services
 }
 
 service::run() {
@@ -173,17 +173,17 @@ service::run() {
   # fi
 
   cd $service_path
-  log::debug "[$(timestamp)][service] docker-compose -f ${DOCKER_COMPOSE_FILE_NAME} $commands"
+  log::debug "[$(timestamp)][service] docker-compose -f ${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME} $commands"
 
   # TESTING MODE
   if [ "$TESTING" = "true" ]; then
     # test dir
     cd $service_path/test
     #
-    export DOCKER_COMPOSE_FILE_NAME=$DOCKER_COMPOSE_TEST_FILE_NAME
+    export PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME=$PLUGIN_SERVICE_DOCKER_COMPOSE_TEST_FILE_NAME
   fi
 
-  $DOCKER_COMPOSE -f ${DOCKER_COMPOSE_FILE_NAME} $commands
+  $PLUGIN_SERVICE_DOCKER_COMPOSE -f ${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME} $commands
 }
 
 service::run_check() {
@@ -231,9 +231,9 @@ service::get_config() {
     exit 1
   fi
 
-  local service_config=$service_path/${DOCKER_COMPOSE_FILE_NAME}
+  local service_config=$service_path/${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME}
   if [ ! -f $service_config ]; then
-    log::error "[$(timestamp)][service] service($service_name) config(${DOCKER_COMPOSE_FILE_NAME}) not found"
+    log::error "[$(timestamp)][service] service($service_name) config(${PLUGIN_SERVICE_DOCKER_COMPOSE_FILE_NAME}) not found"
   fi
 
   echo $service_config

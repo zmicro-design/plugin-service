@@ -45,11 +45,11 @@ core() {
   cd $ZMICRO_PLUGINS_PATH/service/config/local
 
   if [ "$DEBUG" = "true" ]; then
-    $DOCKER_COMPOSE config
+    $PLUGIN_SERVICE_DOCKER_COMPOSE config
     exit 0
   fi
 
-  $DOCKER_COMPOSE up --build
+  $PLUGIN_SERVICE_DOCKER_COMPOSE up --build
 }
 
 run() {

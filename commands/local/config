@@ -40,7 +40,7 @@ core() {
 
   cd $ZMICRO_PLUGINS_PATH/service/config/local
 
-  $DOCKER_COMPOSE config
+  $PLUGIN_SERVICE_DOCKER_COMPOSE config
 }
 
 run() {
