@@ -15,6 +15,7 @@ help() {
   echo "  zmicro service install redis@v1.0.0"
   echo "  zmicro service install redis https://private.example.com/namespace/redis"
   echo "  zmicro service install redis@v1.0.0 redis_service_name"
+  echo "  zmicro service install redis --alias another_redis_name"
 }
 
 core() {
@@ -37,6 +38,14 @@ core() {
   if [ "$2" = "-v" ]; then
     version=$3
     alias_=$4
+  elif [ "$2" = "--alias" ]; then
+    # @4 install redis --alias another_redis_name
+    if [ -z "$3" ]; then
+      log::error "service alias is requried"
+      exit 1
+    fi
+    
+    alias_=$3
   fi
 
   # @3 install redis@v1.2.3 redis_alias
