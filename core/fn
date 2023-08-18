@@ -331,6 +331,9 @@ service::load_config() {
     exit 1
   fi
 
+  export SERVICE_NAME=$name
+  # export SERVICE_VERSION=$(service::get_version $name)
+
   export SERVICE_DATA=$(service::get_data_path $name)
   export SERVICE_LOGS=$(service::get_logs_path $name)
   export SERVICE_CONFIGS=$(service::get_configs_path $name)
