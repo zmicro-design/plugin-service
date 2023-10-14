@@ -46,6 +46,7 @@ core() {
     fi
     
     alias_=$3
+    version="latest"
   fi
 
   # @3 install redis@v1.2.3 redis_alias
@@ -56,7 +57,7 @@ core() {
   fi
 
   export SERVICE_AUTO_START=true
-  service::install $name $version $alias_
+  service::install "$name" "$version" "$alias_"
 }
 
 run() {

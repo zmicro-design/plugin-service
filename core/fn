@@ -528,6 +528,8 @@ service::install() {
     alias_=$name
   fi
 
+  log::info "[$(timestamp)] start to install service ${alias_} ..."
+
   # download
   service::clone $name $version $alias_
 
