@@ -13,6 +13,12 @@ core() {
 
   local service_name=$1
   local args=${@:2}
+
+  # @todo: add default args
+  if [ -z "$args" ]; then
+    args="-f --tail 100"
+  fi
+
   service::run $service_name logs $args
 }
 
