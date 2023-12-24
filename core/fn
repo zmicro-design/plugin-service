@@ -339,6 +339,10 @@ service::load_config() {
   export SERVICE_CONFIGS=$(service::get_configs_path $name)
   export SERVICE_CONFIG=$SERVICE_CONFIGS/config
 
+  # @TODO CPU + Memory (4C8G)
+  export SERVICE_RESOURCE_LIMIT_CPUS=${SERVICE_RESOURCE_LIMIT_CPUS:-"4"}
+  export SERVICE_RESOURCE_LIMIT_MEM=${SERVICE_RESOURCE_LIMIT_MEM:-"8192m"}
+
   # TESTING MODE
   if [ "$TESTING" = "true" ]; then
     SERVICE_CONFIG=$SERVICE_DIR/test/.env
