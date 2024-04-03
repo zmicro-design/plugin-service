@@ -114,29 +114,37 @@ service::list_sub_services() {
 
 service::run() {
   # @TODO
-  which docker >>/dev/null 2>&1
+  log::debug "[$(timestamp)][service] check dockerd exist ..."
+  which dockerd >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
+    log::info "[$(timestamp)][service] dockerd not found, try to install docker ..."
     zmicro package install docker@latest
   fi
 
-   # @TODO
+  log::debug "[$(timestamp)][service] check docker-cli exist ..."
+  which docker >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    log::info "[$(timestamp)][service] docker-cli not found, try to install docker-cli ..."
+    zmicro package install docker-cli@latest
+  fi
+
+  # @TODO
+  log::debug "[$(timestamp)][service] check docker-compose exist ..."
   which docker-compose >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
+    log::info "[$(timestamp)][service] docker-compose not found, try to install docker-compose ..."
     zmicro package install docker-compose@latest
   fi
 
   # if not v2, install v2
+  log::debug "[$(timestamp)][service] check docker-compose version is v2 ..."
   docker-compose -v | grep v2 >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
+    log::info "[$(timestamp)][service] docker-compose version is not v2, try to install docker-compose@latest ..."
     zmicro package install docker-compose@latest
   fi
 
-  which docker >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
-    log::error "[service::run] unexpect error: docker cli not found"
-    exit 1
-  fi
-
+  log::debug "[$(timestamp)] check docker network ${PLUGIN_SERVICE_DOCKER_NETWORK} exist  ..."
   docker network inspect ${PLUGIN_SERVICE_DOCKER_NETWORK} >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     docker network create ${PLUGIN_SERVICE_DOCKER_NETWORK} >>/dev/null
@@ -503,7 +511,7 @@ service::clone() {
       fi
     fi
 
-    if [ ! -r ".git/FETCH_HEAD" ] || [ ! -w ".git/FETCH_HEAD" ]; then 
+    if [ ! -r ".git/FETCH_HEAD" ] || [ ! -w ".git/FETCH_HEAD" ]; then
       sudo chown -R $USER $service_path
     fi
 
