@@ -114,11 +114,13 @@ service::list_sub_services() {
 
 service::run() {
   # @TODO
-  log::debug "[$(timestamp)][service] check dockerd exist ..."
-  which dockerd >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
-    log::info "[$(timestamp)][service] dockerd not found, try to install docker ..."
-    zmicro package install docker@latest
+  if [ "$(os::is_macos)" != "true" ]; then
+    log::debug "[$(timestamp)][service] check dockerd exist ..."
+    which dockerd >>/dev/null 2>&1
+    if [ "$?" != "0" ]; then
+      log::info "[$(timestamp)][service] dockerd not found, try to install docker ..."
+      zmicro package install docker@latest
+    fi
   fi
 
   log::debug "[$(timestamp)][service] check docker-cli exist ..."
