@@ -113,8 +113,8 @@ service::list_sub_services() {
 }
 
 service::run() {
-  # @TODO
-  if [ "$(os::is_macos)" != "true" ]; then
+  # @TODO macos and docker env not check
+  if [ "$(os::is_macos)" != "true" ] && [ "$(os::is_docker)" != "true" ]; then
     log::debug "[$(timestamp)][service] check dockerd exist ..."
     which dockerd >>/dev/null 2>&1
     if [ "$?" != "0" ]; then
