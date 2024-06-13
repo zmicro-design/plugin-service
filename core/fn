@@ -339,6 +339,11 @@ service::load_config() {
     exit 1
   fi
 
+  # @TODO load global config
+  if [ -f "$ZMICRO_RC" ]; then
+    config::load_file $ZMICRO_RC
+  fi
+
   # @TODO
   export SERVICE_DIR=$(service::get_path $name)
   if [ ! -d "$SERVICE_DIR" ]; then
