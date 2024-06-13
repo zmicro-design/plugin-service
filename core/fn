@@ -359,6 +359,9 @@ service::load_config() {
   # 4096m
   export SERVICE_RESOURCE_LIMIT_MEM=${SERVICE_RESOURCE_LIMIT_MEM:-"4294967296"}
 
+  # Docker Image Registry
+  export SERVICE_IMAGE_REGISTRY=${SERVICE_IMAGE_REGISTRY:-"docker.io"}
+
   # TESTING MODE
   if [ "$TESTING" = "true" ]; then
     SERVICE_CONFIG=$SERVICE_DIR/test/.env
