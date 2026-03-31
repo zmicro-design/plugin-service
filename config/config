@@ -25,6 +25,11 @@ if [ -z "$PLUGIN_SERVICE_DOCKER_COMPOSE" ]; then
   if [ "$?" = "0" ]; then
     export PLUGIN_SERVICE_DOCKER_COMPOSE=$(which docker-compose)
   fi
+
+  docker compose >> /dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    export PLUGIN_SERVICE_DOCKER_COMPOSE="docker compose"
+  fi
 fi
 
 # @FIX if first time compose not found, which will install it

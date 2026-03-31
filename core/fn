@@ -130,20 +130,23 @@ service::run() {
     zmicro package install docker-cli@latest
   fi
 
-  # @TODO
-  log::debug "[$(timestamp)][service] check docker-compose exist ..."
-  which docker-compose >>/dev/null 2>&1
+  docker compose >> /dev/null 2>&1
   if [ "$?" != "0" ]; then
-    log::info "[$(timestamp)][service] docker-compose not found, try to install docker-compose ..."
-    zmicro package install docker-compose@latest
-  fi
+    # @TODO
+    log::debug "[$(timestamp)][service] check docker-compose exist ..."
+    which docker-compose >>/dev/null 2>&1
+    if [ "$?" != "0" ]; then
+      log::info "[$(timestamp)][service] docker-compose not found, try to install docker-compose ..."
+      zmicro package install docker-compose@latest
+    fi
 
-  # if not v2, install v2
-  log::debug "[$(timestamp)][service] check docker-compose version is v2 ..."
-  docker-compose -v | grep v2 >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
-    log::info "[$(timestamp)][service] docker-compose version is not v2, try to install docker-compose@latest ..."
-    zmicro package install docker-compose@latest
+    # if not v2, install v2
+    log::debug "[$(timestamp)][service] check docker-compose version is v2 ..."
+    docker-compose -v | grep v2 >>/dev/null 2>&1
+    if [ "$?" != "0" ]; then
+      log::info "[$(timestamp)][service] docker-compose version is not v2, try to install docker-compose@latest ..."
+      zmicro package install docker-compose@latest
+    fi
   fi
 
   log::debug "[$(timestamp)] check docker network ${PLUGIN_SERVICE_DOCKER_NETWORK} exist  ..."
