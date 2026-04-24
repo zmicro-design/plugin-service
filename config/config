@@ -27,7 +27,7 @@ if [ -z "$PLUGIN_SERVICE_DOCKER_COMPOSE" ]; then
   fi
 
   docker compose >> /dev/null 2>&1
-  if [ "$?" != "0" ]; then
+  if [ "$?" = "0" ]; then
     export PLUGIN_SERVICE_DOCKER_COMPOSE="docker compose"
   fi
 fi
